@@ -16,7 +16,7 @@ The two cutting tools and the checker live in `scripts/`:
 | `trim_idifits.py` | FITS-IDI: keeps a subset of `UV_DATA` rows, rewrites `NAXIS2`, copies every other HDU as raw bytes |
 | `trim_uvfits_groups.py` | UVFITS random groups: keeps a subset of groups, rewrites `GCOUNT`, copies every table extension as raw bytes (they move up in the file because the tables *follow* the data) |
 | `verify_excerpt.py` | re-proves the guarantee: hashes everything outside the trimmed segment of the full file and of the excerpt and diffs the trimmed HDU's header card by card |
-| `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it |
+| `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` from its tarball and checks it against `SHA1SUMS` |
 
 `verify_excerpt.py` was run on all nine excerpts below; all nine report
 **`VERDICT: verbatim subset`** with exactly one differing card.
@@ -143,8 +143,10 @@ gated VLBIFiles.jl testitem addresses by name.
 
 **`…BL178AL…excerpt.idifits`** — source
 `VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.idifits`, 5 000 201 280 B, SHA1
-`cdc2f0270fbf576380dac033c8aabb398018e3df` (verified against the request's `SHA1SUMS`),
-request 152951576, download URL
+`cdc2f0270fbf576380dac033c8aabb398018e3df` (verified against the request's `SHA1SUMS`).
+Obtained through <https://data.nrao.edu/portal/> with product locator
+`uid://vlba/correlation/7c866aab-9bc3-40a4-ac54-b78f3dd2aa22`; there is no direct URL. The
+staging request that served it was 152951576, download URL
 `https://dl-dsoc.nrao.edu/anonymous/152951576/667047394073cca89fb17619ed0153ad/BL178/BL178AL/VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.idifits`
 (request-scoped, expires).
 Same MOJAVE 8×LSB/USB setup, `CORRVERS = DIFX-2.1`.
@@ -299,16 +301,23 @@ here — and it is the counterexample to any "descending `PC_FREQ` means LSB" he
 
 ## `pkg-data/` — the fixtures VLBIFiles.jl used to carry in `test/data/`
 
-Copied **byte for byte** out of the package repository when the package stopped carrying data
-of its own; nothing here was cut, rewritten or regenerated. Unlike the rest of this repository
-they are not all raw correlator output — five are images, three are difmap model files and one
-is a fourfit `alist` summary — and only eight have an exact recorded source URL: the six the
-test suite used to fetch on demand (the URL is the one in the code that fetched them),
-`M87_EHT_2018_3644_b3.fits`, which is a published CDS catalogue file and was downloaded from
-there, and `J0743-5619_S_2011_08_13_dew_map.fits`, downloaded from astrogeo.org. The others are
-stated as *legacy VLBIFiles test fixture, original source not re-verified*: the header
-identification below is read out of the file itself and is fact; the download it came from is
-not recorded anywhere and is not guessed at here.
+Nothing here was cut, rewritten or regenerated — but the twenty files did not all reach this
+repository the same way, and the difference is exactly the eight that have a source URL.
+**Twelve were copied byte for byte** out of the package repository when the package stopped
+carrying data of its own. **Six were never in it**: the old test suite downloaded them on demand
+at run time, so what was copied out was the URL in the code that fetched them, and the file here
+was downloaded from that URL — `BL146_1.fits`, `DDTSUVDATA.fits`, `0332-391.uvfits`,
+`mwa_1061316296.uvfits`, `paper_zen.uvfits`, `J1256-0547_X_2020_10_18_pet_vis.fits`.
+**Two were downloaded for this repository**, to serve testitems that had no publishable fixture:
+`M87_EHT_2018_3644_b3.fits` from the CDS catalogue that publishes it, and
+`J0743-5619_S_2011_08_13_dew_map.fits` from astrogeo.org.
+Each of those eight was re-downloaded from its URL on **2026-08-19** and the served bytes were
+byte-identical to the copy staged here, so the entries below pin the original SHA1 the way every
+other section of this manifest does. The remaining twelve are stated as *legacy VLBIFiles test
+fixture, original source not re-verified*: the header identification below is read out of the
+file itself and is fact; the download it came from is not recorded anywhere and is not guessed
+at here. Unlike the rest of this repository they are not all raw correlator output — five are
+images, three are difmap model files and one is a fourfit `alist` summary.
 
 | file | bytes | staged SHA1 | transformation |
 |---|---|---|---|
@@ -352,7 +361,8 @@ AIPS UVFITS, `OBSERVER = BH019`, `DATE-OBS = 1996-06-05`, J0414+053A at 4.60 GHz
 CRPIX=1 multichan`) and the `.vis` extension branch of `guess_type`.
 
 **`BL146_1.fits`** — <https://fits.gsfc.nasa.gov/registry/fitsidi/BL146_1.fits>, the FITS-IDI
-registry sample of the NASA GSFC FITS Support Office (2 448 000 B, unchanged).
+registry sample of the NASA GSFC FITS Support Office, original SHA1
+`f4ab6eea1ece41483b3dc5ec247d69c342be633c` (2 448 000 B, unchanged).
 VLBA hardware correlator, `ORIGIN = 'VLBA Correlator'`, `FXCORVER = 4.22`,
 `DATE-OBS = 2007-08-23`, 4 bands × 8 channels × 4 Stokes, 1 000 `UV_DATA` rows, and the full
 auxiliary set: `INTERFEROMETER_MODEL` (640), `MODEL_COMPS` (1 060), `PHASE-CAL` (241),
@@ -363,8 +373,9 @@ auxiliary set: `INTERFEROMETER_MODEL` (640), `MODEL_COMPS` (1 060), `PHASE-CAL` 
 `RDATE fallback to ARRAY_GEOMETRY`, the `NO_POL = 2` control of the single-polarization item,
 the per-band `FLAG` widening path, and the one-HDU-per-name control of the e-MERLIN item.
 
-**`DDTSUVDATA.fits`** — <https://fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits> (596 160 B,
-unchanged). VLA, 3C161, `DATE-OBS = 29/01/84`, written by AIPS in 1995
+**`DDTSUVDATA.fits`** — <https://fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits>, original SHA1
+`12e46c6deefa634b96065ed461e93d9d4eb1392c` (596 160 B, unchanged).
+VLA, 3C161, `DATE-OBS = 29/01/84`, written by AIPS in 1995
 (`ORIGIN = 'AIPSRhesus NRAO/CV 580 15JUL95'`), 1.420 GHz, 28 antennas, 7 956 groups.
 `NAXIS = 6`: the axis set is COMPLEX/STOKES/FREQ/RA/DEC with **no IF axis at all**.
 *Serves:* `uvf NAXIS=6 no IF axis (DDTSUVDATA)` — the reader must synthesise the single
@@ -373,7 +384,8 @@ which pins the two-digit-year `DD/MM/YY` date parsing.
 
 **`0332-391.uvfits`** —
 <https://github.com/astro-informatics/purify/raw/development/data/atca/0332-391.uvfits>
-(14 670 720 B, unchanged). ATCA, `DATE-OBS = 2001-05-20`, written by Miriad `atlod`/`fits`,
+original SHA1 `7e4e2a73864816ee1a21adfa0ba850e04df49da0` (14 670 720 B, unchanged).
+ATCA, `DATE-OBS = 2001-05-20`, written by Miriad `atlod`/`fits`,
 1.432 GHz, 13 channels, Stokes I/Q/U/V, 6 antennas, 22 675 groups, **`CDELT4 < 0` with no
 `AIPS FQ` table**.
 *Serves:* `uvf NAXIS=6 no IF axis (ATCA)` — the sideband has to come from `sign(CDELT4)` when
@@ -381,22 +393,25 @@ there is no FQ table, and UVFITS values stay verbatim (no conjugation) even so, 
 FITS-IDI meaning of `sideband == -1`.
 
 **`mwa_1061316296.uvfits`** — <https://github.com/RadioAstronomySoftwareGroup/rasg-datasets>
-`v0.0.4/visibility_data/MWA/1061316296.uvfits`, renamed (1 529 280 B, unchanged).
+`v0.0.4/visibility_data/MWA/1061316296.uvfits`, renamed, original SHA1
+`947eb742ae446f7414e43b9bc30d9365965639aa` (1 529 280 B, unchanged).
 MWA, `DATE-OBS = 2013-08-23`, written by pyuvdata 2.1.3, 167.075 MHz, linear feeds
 (`XX/YY/XY/YX`), 16 256 groups, **every weight ≤ 0**.
 *Serves:* `uvf linear polarization (MWA)` — linear-feed Stokes labelling, and the
 all-flagged case in which `uvtable` legitimately comes out empty while `uvtable_wide` does not.
 
 **`paper_zen.uvfits`** — same repository,
-`v0.0.4/visibility_data/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits`, renamed (66 240 B,
-unchanged). PAPER, `DATE-OBS = 2014-07-27`, Miriad, 100 MHz, 11 channels, `NAXIS = 6`,
-a single `XY` product, 285 groups.
+`v0.0.4/visibility_data/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits`, renamed, original SHA1
+`136e6beaf0c02e11b7bf3b4ad4a8eb4770e70158` (66 240 B, unchanged).
+PAPER, `DATE-OBS = 2014-07-27`, Miriad, 100 MHz, 11 channels, `NAXIS = 6`, a single `XY`
+product, 285 groups.
 *Serves:* `uvf NAXIS=6 linear pol (PAPER)`, and `faithful warnings` — the file that makes the
 reader warn exactly once about what it cannot represent faithfully.
 
 **`J1256-0547_X_2020_10_18_pet_vis.fits`** —
-<https://astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits> (236 160 B,
-unchanged). VLBA X-band, `DATE-OBS = 2020-10-18`, experiment `uh007b`, merged by
+<https://astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits>, original SHA1
+`daa9bd688580ab5016caa2708ae57d24b8ca9fed` (236 160 B, unchanged).
+VLBA X-band, `DATE-OBS = 2020-10-18`, experiment `uh007b`, merged by
 `UVA_MERGE v 2.1`: **three `AIPS AN` tables** (subarrays 1, 2, 3) with 8, 9 and 10 antennas,
 1 132 groups.
 *Serves:* `uvf multi-array baselines` — the baseline number carries the subarray in its
@@ -447,8 +462,9 @@ cards, 0.003125° pixels — a mean uv-sampling map rather than a sky image.
 report the missing `BMAJ` key rather than inventing one.
 
 **`M87_EHT_2018_3644_b3.fits`** —
-<https://cdsarc.cds.unistra.fr/ftp/J/A+A/681/A79/fits/M87_EHT_2018_3644_b3.fits> (570 240 B,
-unchanged), the FITS image attached to the CDS catalogue
+<https://cdsarc.cds.unistra.fr/ftp/J/A+A/681/A79/fits/M87_EHT_2018_3644_b3.fits>, original SHA1
+`f46d3db9879c32da29afd3cd1f2c472f392dc8c9` (570 240 B, unchanged), the FITS image attached to
+the CDS catalogue
 [J/A+A/681/A79](https://cdsarc.cds.unistra.fr/viz-bin/cat/J/A+A/681/A79) of Event Horizon
 Telescope Collaboration 2024, A&A 681, A79 — its `list.dat` describes it as the
 "representative image of M 87* from the EHT observations taken on 2018 April 21 at band 3"
@@ -460,8 +476,9 @@ no `BMAJ`/`BMIN`, and an `AIPS CC` table of 15 223 components.
 Jy-something, and `beam` reporting the missing `BMAJ` key on a file that has none.
 
 **`J0743-5619_S_2011_08_13_dew_map.fits`** —
-<https://astrogeo.org/images/J0743-5619/J0743-5619_S_2011_08_13_dew_map.fits> (1 082 880 B,
-unchanged), from the astrogeo.org VLBI image database (L. Petrov), the `dew` pipeline of the
+<https://astrogeo.org/images/J0743-5619/J0743-5619_S_2011_08_13_dew_map.fits>, original SHA1
+`c26ea431800fda2e5ca91cdef73767e53d14f7c1` (1 082 880 B, unchanged), from the astrogeo.org
+VLBI image database (L. Petrov), the `dew` pipeline of the
 LBA Calibrator Survey — `AUTHOR = 'Alet de Witt'`, `REFERENC` the LCS2 paper
 (2019MNRAS.485...88P). VLBA S-band, `DATE-OBS = 2011-08-13`, experiment `v278b`, 2.28475 GHz,
 512² CLEAN image, `CDELT1 = -2.777777866E-07` deg (1 mas pixels), `CRPIX1 = 256`,
@@ -492,8 +509,8 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 8 | 194 777 280 |
 | `pkg-data/` | 20 | 30 358 810 |
-| `scripts/` | 4 | 42 189 |
-| **total (data + scripts)** | **40 + 4** | **530 193 319 B ≈ 530.2 MB** |
+| `scripts/` | 4 | 43 362 |
+| **total (data + scripts)** | **40 + 4** | **530 194 492 B ≈ 530.2 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.

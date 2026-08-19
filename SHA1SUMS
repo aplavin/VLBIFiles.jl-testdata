@@ -35,7 +35,7 @@ f46d3db9879c32da29afd3cd1f2c472f392dc8c9  pkg-data/M87_EHT_2018_3644_b3.fits
 98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5  pkg-data/SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits
 9869f076976bdc1881f3b7174311b0994d2d2b19  pkg-data/vis.fits
 70c38e69b4ff67f098aeffdf4cc0c26922097c21  pkg-data/vis_multichan.vis
-c56b085a9fcc5fa6c617253638528eabc21b7b53  scripts/MAKE.sh
+bf4db9e25985365ad45ce027b0c41ca43f39d404  scripts/MAKE.sh
 2e80b3447d06e3f0095b2ec5e858fe6bc9bee033  scripts/trim_idifits.py
 6c8a933e518632f123fd501cea990f943cc3e4bd  scripts/trim_uvfits_groups.py
 55a5983d89cae0bf988082c46f962083296c5653  scripts/verify_excerpt.py

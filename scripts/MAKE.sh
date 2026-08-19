@@ -12,6 +12,13 @@
 #   requirements: python3.11, astropy >= 6, numpy >= 1.24, curl
 #   usage:        SRC=/some/scratch/dir sh MAKE.sh          (needs ~17 GB of scratch)
 #
+# The excerpts committed here were built with python 3.11.11, astropy 8.0.1 and numpy 2.2.5.
+# Three of the calls below rank source-blocks by amplitude (--blocks > 0) and probe them with
+# rows drawn from numpy's default_rng, so which rows they keep depends on the seed; `--seed 0`
+# is written out there rather than left to trim_idifits.py's default, which is the same 0.
+# Checked 2026-08-19: bd152ie rebuilt with the explicit flag is byte-identical to the excerpt
+# committed here.
+#
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
@@ -67,7 +74,7 @@ get http://astrogeo.org/s0/vlba_fits/bd152ie/VLBA_BD152IE_gatedie_BIN0_SRC0_0_12
     VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.idifits
 $TRIM_IDI "$SRC/VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.idifits" \
     "$ROOT/astrogeo/VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.excerpt.idifits" \
-    --target-mb 18 --blocks 2 --nbl 2 --nauto 2
+    --target-mb 18 --blocks 2 --nbl 2 --nauto 2 --seed 0
 $VERIFY "$SRC/VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.idifits" \
     "$ROOT/astrogeo/VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.excerpt.idifits"
 
@@ -89,7 +96,7 @@ AL="$SRC/VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.idifits"
 if [ -f "$AC" ]; then
     $TRIM_IDI "$AC" \
         "$ROOT/vlba-difx/VLBA_BL178AC_bl178ac_BIN0_SRC0_0_111228T171125.excerpt.idifits" \
-        --target-mb 60 --anchor 'KP-LA@2011-12-12T02:09:30/2011-12-12T02:12:44'
+        --target-mb 60 --anchor 'KP-LA@2011-12-12T02:09:30/2011-12-12T02:12:44' --seed 0
     $VERIFY "$AC" \
         "$ROOT/vlba-difx/VLBA_BL178AC_bl178ac_BIN0_SRC0_0_111228T171125.excerpt.idifits"
 else
@@ -98,7 +105,7 @@ fi
 if [ -f "$AL" ]; then
     $TRIM_IDI "$AL" \
         "$ROOT/vlba-difx/VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.excerpt.idifits" \
-        --target-mb 50 --anchor 'FD-LA@2012-06-25T23:30:44/2012-06-25T23:36:30'
+        --target-mb 50 --anchor 'FD-LA@2012-06-25T23:30:44/2012-06-25T23:36:30' --seed 0
     $VERIFY "$AL" \
         "$ROOT/vlba-difx/VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.excerpt.idifits"
 else
@@ -140,8 +147,17 @@ $TRIM_UVF "$SRC/SVS13C.sub.SWARM.lsb.s3.170127.uvfits" \
 $VERIFY "$SRC/SVS13C.sub.SWARM.lsb.s3.170127.uvfits" \
     "$ROOT/misc/sma_masses/SVS13C.sub.SWARM.lsb.s3.170127.excerpt.uvfits"
 
+# --- K08161.0.FITS : one member of the MPIfR DiFX 1.5.0 test-data tarball, 1 370 554 B ---
+# The one file here whose published bytes are not a download but a tarball member, so
+# extracting it is the whole procedure — no trimming, no rewriting.  The member is 216 000 B
+# and comes out byte for byte as committed, which the SHA1SUMS line below is the proof of.
+get https://ftp.mpifr-bonn.mpg.de/vlbiarchive/DiFX_testdata/k08161/k08161.difx-1.5.0.outputfiles.tar.gz \
+    k08161.difx-1.5.0.outputfiles.tar.gz
+tar -xzOf "$SRC/k08161.difx-1.5.0.outputfiles.tar.gz" K08161.0.FITS > "$ROOT/misc/K08161.0.FITS"
+(cd "$ROOT" && grep ' misc/K08161\.0\.FITS$' SHA1SUMS | sha1sum -c -)
+
 # Files copied whole (no transformation, no command needed) — see README.md for every URL:
-#   misc/K08161.0.FITS, misc/emerlin_multiuv.IDI1,
+#   misc/emerlin_multiuv.IDI1,
 #   misc/sma_masses/Per35.SWARM.1.3mm.s1.{lsb,usb}.1.151006.uvfits,
 #   vsop/v050c.fits.1-8, jive/n09q2_1_1-shortened.IDI1, jive/ep075f_WSRT.IDI1
 
