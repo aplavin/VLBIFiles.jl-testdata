@@ -301,12 +301,13 @@ here — and it is the counterexample to any "descending `PC_FREQ` means LSB" he
 
 Copied **byte for byte** out of the package repository when the package stopped carrying data
 of its own; nothing here was cut, rewritten or regenerated. Unlike the rest of this repository
-they are not all raw correlator output — three are images, three are difmap model files and one
-is a fourfit `alist` summary — and only six have an exact recorded source URL, namely the six
-the test suite used to fetch on demand (the URL is the one in the code that fetched them). The
-others are stated as *legacy VLBIFiles test fixture, original source not re-verified*: the
-header identification below is read out of the file itself and is fact; the download it came
-from is not recorded anywhere and is not guessed at here.
+they are not all raw correlator output — four are images, three are difmap model files and one
+is a fourfit `alist` summary — and only seven have an exact recorded source URL: the six the
+test suite used to fetch on demand (the URL is the one in the code that fetched them) and
+`M87_EHT_2018_3644_b3.fits`, which is a published CDS catalogue file and was downloaded from
+there. The others are stated as *legacy VLBIFiles test fixture, original source not
+re-verified*: the header identification below is read out of the file itself and is fact; the
+download it came from is not recorded anywhere and is not guessed at here.
 
 | file | bytes | staged SHA1 | transformation |
 |---|---|---|---|
@@ -314,6 +315,7 @@ from is not recorded anywhere and is not guessed at here.
 | `BL146_1.fits` | 2 448 000 | `f4ab6eea1ece41483b3dc5ec247d69c342be633c` | none |
 | `DDTSUVDATA.fits` | 596 160 | `12e46c6deefa634b96065ed461e93d9d4eb1392c` | none |
 | `J1256-0547_X_2020_10_18_pet_vis.fits` | 236 160 | `daa9bd688580ab5016caa2708ae57d24b8ca9fed` | none |
+| `M87_EHT_2018_3644_b3.fits` | 570 240 | `f46d3db9879c32da29afd3cd1f2c472f392dc8c9` | none |
 | `SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits` | 1 238 400 | `98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5` | none |
 | `alist_v6.fsumm` | 127 814 | `77226072ae5dba628e2e855f68c130f2356c69f8` | none |
 | `datafile_01-01_230GHz.uvfits` | 178 560 | `c1ae1e63c2c297a9442a9eb57d28fee0c8e9694c` | none |
@@ -442,6 +444,19 @@ cards, 0.003125° pixels — a mean uv-sampling map rather than a sky image.
 *Serves:* `img nonstandard header names` — axes and units must still read, and `beam` must
 report the missing `BMAJ` key rather than inventing one.
 
+**`M87_EHT_2018_3644_b3.fits`** —
+<https://cdsarc.cds.unistra.fr/ftp/J/A+A/681/A79/fits/M87_EHT_2018_3644_b3.fits> (570 240 B,
+unchanged), the FITS image attached to the CDS catalogue
+[J/A+A/681/A79](https://cdsarc.cds.unistra.fr/viz-bin/cat/J/A+A/681/A79) of Event Horizon
+Telescope Collaboration 2024, A&A 681, A79 — its `list.dat` describes it as the
+"representative image of M 87* from the EHT observations taken on 2018 April 21 at band 3"
+(`3644` is the EHT experiment number of that track).
+128² image, `BITPIX = -64`, `TELESCOP = 'EHT'`, `DATE-OBS = 2018-04-20`, 227.100 GHz,
+`CDELT1 = -3.2552e-10` deg (1.171875 µas pixels, 150 µas across), **`BUNIT = '10^9 K'`**,
+no `BMAJ`/`BMIN`, and an `AIPS CC` table of 15 223 components.
+*Serves:* `img strange units` — the brightness-temperature unit no reader may assume is
+Jy-something, and `beam` reporting the missing `BMAJ` key on a file that has none.
+
 **`difmap_model.mod`, `difmap_model_clean.mod`, `difmap_model_empty.mod`** — legacy VLBIFiles
 test fixtures, original source not re-verified. difmap model files: 4 components with
 `v`-marked free parameters and a `SpecIndex` column; 631 delta components; and a file with a
@@ -460,9 +475,9 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `jive/` | 2 | 79 496 640 |
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 8 | 194 777 280 |
-| `pkg-data/` | 18 | 28 705 690 |
+| `pkg-data/` | 19 | 29 275 930 |
 | `scripts/` | 4 | 42 189 |
-| **total (data + scripts)** | **38 + 4** | **528 540 199 B ≈ 528.5 MB** |
+| **total (data + scripts)** | **39 + 4** | **529 110 439 B ≈ 529.1 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.

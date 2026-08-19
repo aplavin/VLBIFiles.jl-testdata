@@ -16,9 +16,9 @@ assumptions the reader is being tested for.
 `VLBIFiles.jl/test/data/` since the package began, moved here so that the package repository
 carries no data at all. They are real files too — real visibilities, and real *products* of
 real data (CLEAN images, difmap models, a fourfit alist summary, a mean uv-sampling map), which
-raw correlator output is not. Six of them have an exact source URL, recorded below; the rest are
-long-standing fixtures whose original download was never recorded, and they are marked as such
-rather than given a plausible-looking provenance.
+raw correlator output is not. Seven of them have an exact source URL, recorded below; the rest
+are long-standing fixtures whose original download was never recorded, and they are marked as
+such rather than given a plausible-looking provenance.
 
 The files are too large, and too numerous, to live inside the package repository, so the test
 suite of VLBIFiles.jl clones this repository into `VLBIFiles.jl/test/VLBIFiles.jl-testdata/`
@@ -121,12 +121,13 @@ table set — `PHASE-CAL` (`NO_TONES = 3`, non-monotonic tone frequencies), `SYS
 
 ### `pkg-data/` — the package's own fixtures, moved out of `VLBIFiles.jl/test/data/`
 
-Eighteen small files (28 705 690 B together) that VLBIFiles.jl has always tested against: the
+Nineteen small files (29 275 930 B together) that VLBIFiles.jl has always tested against: the
 UVFITS/FITS-IDI readers, the image and difmap-model readers, the alist reader. They are
 unchanged — copied byte for byte out of the package repository, no excerpting, no rewriting —
 and the "source URL" column says what is *known* about each. Six were fetched on demand by the
-test suite itself, so their URL is recorded in the code that fetched them; the rest predate any
-such record and say so.
+test suite itself, so their URL is recorded in the code that fetched them; a seventh, the EHT
+M87 image, is a published CDS catalogue file and was downloaded from there; the rest predate
+any such record and say so.
 
 | file | bytes / SHA1 | source | what it is / used by |
 |---|---|---|---|
@@ -145,14 +146,20 @@ such record and say so.
 | `map.fits` | 1 071 360 / `9cba0872d2d8ea73bcc56dfdc84dbbfef7c5ad87` | legacy VLBIFiles test fixture, original source not re-verified | 512² CLEAN image of J0000+0248 (`bp192d3`, 2016-01-03) written by `PIMA 2.26`, with an `AIPS CC` table of 361 components — the image fixture (`img read data`, `img read clean`, `img clean/residual/combined`, `difmap model`) |
 | `map_stacked.fits` | 2 234 880 / `132092bcf885761e3e88388ef1cb437407850e4b` | legacy VLBIFiles test fixture, original source not re-verified | 512² stacked CLEAN image, J0738+17 (`BR034`, 1996-01-19), difmap → AIPS, circular beam, **no CC table** — `img stacked` |
 | `sampling_mean.fits` | 529 920 / `2689580af4d20ca33b98ac40afb2616423c6e920` | legacy VLBIFiles test fixture, original source not re-verified | 256² mean uv-sampling map, `TELESCOP = 'VLBI'`, `OBJECT = 'Unknown'`, `JY/PIXEL`, no `BMAJ` — the nonstandard-header image case (`img nonstandard header names`) |
+| `M87_EHT_2018_3644_b3.fits` | 570 240 / `f46d3db9879c32da29afd3cd1f2c472f392dc8c9` | [`cdsarc J/A+A/681/A79 fits/M87_EHT_2018_3644_b3.fits`](https://cdsarc.cds.unistra.fr/ftp/J/A+A/681/A79/fits/M87_EHT_2018_3644_b3.fits) (the image attached to CDS catalogue [J/A+A/681/A79](https://cdsarc.cds.unistra.fr/viz-bin/cat/J/A+A/681/A79), EHT Collaboration 2024, A&A 681, A79) | 128² representative EHT image of M 87* from the 2018 April 21 track (experiment `3644`), band 3, 227.1 GHz, 1.17 µas pixels, **`BUNIT = '10^9 K'`** and no `BMAJ`, with an `AIPS CC` table of 15 223 components — `img strange units` |
 | `difmap_model.mod` | 532 / `7520d0c60635a889c766ba7b8e1cd4427c70715d` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file, 4 components with `v`-marked free parameters — `difmap model`, `generic loading` |
 | `difmap_model_clean.mod` | 24 964 / `80163e3eea24b0dc4489465bf81178d0b64566e4` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file, 631 delta components — `difmap model` |
 | `difmap_model_empty.mod` | 60 / `463d1702e22794fc0b1b68b86a6dd8e3cd6b5218` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file with a phase-centre line and no components — `difmap model`, `generic loading` |
 
-Three further fixtures are referenced by the test suite under `pkg-data/` but are **not**
-published here — `M87_EHT_2018_3644_b3.fits`, `GOALS_GroupS2_Ref59_Cals_Avg.idi` and
-`J0840-5732_X_2010_03_11_dew_map.fits`. Their testitems skip themselves unless the file is
-dropped into `pkg-data/` by hand, exactly as they did while the package still had a `test/data/`.
+Two further fixtures are referenced by the test suite under `pkg-data/` but are **not**
+published here. `J0840-5732_X_2010_03_11_dew_map.fits` is public — it is
+<https://astrogeo.org/images/J0840-5732/J0840-5732_X_2010_03_11_dew_map.fits>, SHA1
+`1574f886f4339c4670086a980388cb7f685f9fa5` — but its first of two `AIPS CC` tables holds
+10 000 000 components, so the file is 124 217 280 B and exceeds GitHub's 100 MiB per-file
+limit; it can only be fetched from astrogeo directly. `GOALS_GroupS2_Ref59_Cals_Avg.idi`, the
+Obit-written MeerKAT FITS-IDI, has no located public source at all. Their testitems skip
+themselves unless the file is dropped into `pkg-data/` by hand, exactly as they did while the
+package still had a `test/data/`.
 
 `scripts/` (4 files) holds `trim_idifits.py`, `trim_uvfits_groups.py`, `verify_excerpt.py` and
 `MAKE.sh`; they are documentation and reproduction tools, not data.
@@ -208,7 +215,10 @@ re-publication of anyone's science.
   National Facility instrument); and the **Radio Astronomy Software Group**'s `rasg-datasets`
   (`mwa_1061316296.uvfits`, `paper_zen.uvfits`,
   <https://github.com/RadioAstronomySoftwareGroup/rasg-datasets>, MWA and PAPER data
-  redistributed there for pyuvdata's test suite). The three EHT files
+  redistributed there for pyuvdata's test suite); and the **CDS** (Strasbourg astronomical Data
+  Center, <https://cds.unistra.fr/>), which publishes `M87_EHT_2018_3644_b3.fits` as the image
+  attached to catalogue J/A+A/681/A79 of Event Horizon Telescope Collaboration 2024,
+  A&A 681, A79. The three other EHT files
   (`SR1_3C279_…`, `hops_3600_OJ287_…`, `datafile_01-01_230GHz.uvfits`) are products of **Event
   Horizon Telescope** observations — they came into the package before any download record was
   kept, so the exact release they were taken from is stated as unverified rather than guessed;
