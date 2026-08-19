@@ -301,19 +301,21 @@ here — and it is the counterexample to any "descending `PC_FREQ` means LSB" he
 
 Copied **byte for byte** out of the package repository when the package stopped carrying data
 of its own; nothing here was cut, rewritten or regenerated. Unlike the rest of this repository
-they are not all raw correlator output — four are images, three are difmap model files and one
-is a fourfit `alist` summary — and only seven have an exact recorded source URL: the six the
-test suite used to fetch on demand (the URL is the one in the code that fetched them) and
+they are not all raw correlator output — five are images, three are difmap model files and one
+is a fourfit `alist` summary — and only eight have an exact recorded source URL: the six the
+test suite used to fetch on demand (the URL is the one in the code that fetched them),
 `M87_EHT_2018_3644_b3.fits`, which is a published CDS catalogue file and was downloaded from
-there. The others are stated as *legacy VLBIFiles test fixture, original source not
-re-verified*: the header identification below is read out of the file itself and is fact; the
-download it came from is not recorded anywhere and is not guessed at here.
+there, and `J0743-5619_S_2011_08_13_dew_map.fits`, downloaded from astrogeo.org. The others are
+stated as *legacy VLBIFiles test fixture, original source not re-verified*: the header
+identification below is read out of the file itself and is fact; the download it came from is
+not recorded anywhere and is not guessed at here.
 
 | file | bytes | staged SHA1 | transformation |
 |---|---|---|---|
 | `0332-391.uvfits` | 14 670 720 | `7e4e2a73864816ee1a21adfa0ba850e04df49da0` | none |
 | `BL146_1.fits` | 2 448 000 | `f4ab6eea1ece41483b3dc5ec247d69c342be633c` | none |
 | `DDTSUVDATA.fits` | 596 160 | `12e46c6deefa634b96065ed461e93d9d4eb1392c` | none |
+| `J0743-5619_S_2011_08_13_dew_map.fits` | 1 082 880 | `c26ea431800fda2e5ca91cdef73767e53d14f7c1` | none |
 | `J1256-0547_X_2020_10_18_pet_vis.fits` | 236 160 | `daa9bd688580ab5016caa2708ae57d24b8ca9fed` | none |
 | `M87_EHT_2018_3644_b3.fits` | 570 240 | `f46d3db9879c32da29afd3cd1f2c472f392dc8c9` | none |
 | `SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits` | 1 238 400 | `98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5` | none |
@@ -457,6 +459,20 @@ no `BMAJ`/`BMIN`, and an `AIPS CC` table of 15 223 components.
 *Serves:* `img strange units` — the brightness-temperature unit no reader may assume is
 Jy-something, and `beam` reporting the missing `BMAJ` key on a file that has none.
 
+**`J0743-5619_S_2011_08_13_dew_map.fits`** —
+<https://astrogeo.org/images/J0743-5619/J0743-5619_S_2011_08_13_dew_map.fits> (1 082 880 B,
+unchanged), from the astrogeo.org VLBI image database (L. Petrov), the `dew` pipeline of the
+LBA Calibrator Survey — `AUTHOR = 'Alet de Witt'`, `REFERENC` the LCS2 paper
+(2019MNRAS.485...88P). VLBA S-band, `DATE-OBS = 2011-08-13`, experiment `v278b`, 2.28475 GHz,
+512² CLEAN image, `CDELT1 = -2.777777866E-07` deg (1 mas pixels), `CRPIX1 = 256`,
+`CRPIX2 = 257`, `BUNIT = JY/BEAM` and **no `BMAJ`/`BMIN`**, and — the point of the file — **two
+`AIPS CC` tables**, `EXTVER = 1` with 507 components and `EXTVER = 2` with 25, plus an `AIPS CG`
+table. Replaces `J0840-5732_X_2010_03_11_dew_map.fits`, which has the same two-CC-table
+structure out of the same pipeline but whose first table holds 10 000 000 components, making it
+124 217 280 B — past GitHub's 100 MiB per-file limit and unpublishable here.
+*Serves:* `img read two CC tables` — with more than one `AIPS CC` table present the reader must
+take the last one (highest `EXTVER`), i.e. 25 components and not 507.
+
 **`difmap_model.mod`, `difmap_model_clean.mod`, `difmap_model_empty.mod`** — legacy VLBIFiles
 test fixtures, original source not re-verified. difmap model files: 4 components with
 `v`-marked free parameters and a `SpecIndex` column; 631 delta components; and a file with a
@@ -475,9 +491,9 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `jive/` | 2 | 79 496 640 |
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 8 | 194 777 280 |
-| `pkg-data/` | 19 | 29 275 930 |
+| `pkg-data/` | 20 | 30 358 810 |
 | `scripts/` | 4 | 42 189 |
-| **total (data + scripts)** | **39 + 4** | **529 110 439 B ≈ 529.1 MB** |
+| **total (data + scripts)** | **40 + 4** | **530 193 319 B ≈ 530.2 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.
