@@ -23,8 +23,8 @@ rather than given a plausible-looking provenance.
 The files are too large, and too numerous, to live inside the package repository, so the test
 suite of VLBIFiles.jl clones this repository into `VLBIFiles.jl/test/VLBIFiles.jl-testdata/`
 the first time a testitem needs a file, and uses an existing directory there as it is — no
-fetch, no update. `VLBIFILES_TESTDATA` points at an existing checkout instead. Testitems whose
-files are absent (no checkout and no network) skip themselves with a message.
+fetch, no update, no network access. A checkout moves forward only when you `git pull` in it.
+Testitems whose files are absent (no checkout and no network) skip themselves with a message.
 
 ## The verbatim-subset excerpt
 
