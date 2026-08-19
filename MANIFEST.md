@@ -4,7 +4,10 @@ Every file here is either **a byte-identical copy of a published file**, or **a 
 of one**: a copy in which only the visibility container was shortened (a subset of records, each
 copied byte for byte, in the original order) and exactly one header card — FITS-IDI `NAXIS2` or
 UVFITS `GCOUNT` — was rewritten to the new record count. No value is ever recomputed, rescaled,
-averaged, reordered or synthesised, and no other HDU is altered in any way.
+averaged, reordered or synthesised, and no other HDU is altered in any way. The files in
+`pkg-data/` are byte-identical copies too, but of the fixtures that lived in
+`VLBIFiles.jl/test/data/` rather than of an archive URL — see that section for what is and is
+not known about where each came from.
 
 The two cutting tools and the checker live in `scripts/`:
 
@@ -294,6 +297,160 @@ here — and it is the counterexample to any "descending `PC_FREQ` means LSB" he
 
 ---
 
+## `pkg-data/` — the fixtures VLBIFiles.jl used to carry in `test/data/`
+
+Copied **byte for byte** out of the package repository when the package stopped carrying data
+of its own; nothing here was cut, rewritten or regenerated. Unlike the rest of this repository
+they are not all raw correlator output — three are images, three are difmap model files and one
+is a fourfit `alist` summary — and only six have an exact recorded source URL, namely the six
+the test suite used to fetch on demand (the URL is the one in the code that fetched them). The
+others are stated as *legacy VLBIFiles test fixture, original source not re-verified*: the
+header identification below is read out of the file itself and is fact; the download it came
+from is not recorded anywhere and is not guessed at here.
+
+| file | bytes | staged SHA1 | transformation |
+|---|---|---|---|
+| `0332-391.uvfits` | 14 670 720 | `7e4e2a73864816ee1a21adfa0ba850e04df49da0` | none |
+| `BL146_1.fits` | 2 448 000 | `f4ab6eea1ece41483b3dc5ec247d69c342be633c` | none |
+| `DDTSUVDATA.fits` | 596 160 | `12e46c6deefa634b96065ed461e93d9d4eb1392c` | none |
+| `J1256-0547_X_2020_10_18_pet_vis.fits` | 236 160 | `daa9bd688580ab5016caa2708ae57d24b8ca9fed` | none |
+| `SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits` | 1 238 400 | `98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5` | none |
+| `alist_v6.fsumm` | 127 814 | `77226072ae5dba628e2e855f68c130f2356c69f8` | none |
+| `datafile_01-01_230GHz.uvfits` | 178 560 | `c1ae1e63c2c297a9442a9eb57d28fee0c8e9694c` | none |
+| `difmap_model.mod` | 532 | `7520d0c60635a889c766ba7b8e1cd4427c70715d` | none |
+| `difmap_model_clean.mod` | 24 964 | `80163e3eea24b0dc4489465bf81178d0b64566e4` | none |
+| `difmap_model_empty.mod` | 60 | `463d1702e22794fc0b1b68b86a6dd8e3cd6b5218` | none |
+| `hops_3600_OJ287_LO+HI.medcal_dcal_full.uvfits` | 794 880 | `02bb180639a3dad2233be7d867a44ed9f2d4f57c` | none |
+| `map.fits` | 1 071 360 | `9cba0872d2d8ea73bcc56dfdc84dbbfef7c5ad87` | none |
+| `map_stacked.fits` | 2 234 880 | `132092bcf885761e3e88388ef1cb437407850e4b` | none |
+| `mwa_1061316296.uvfits` | 1 529 280 | `947eb742ae446f7414e43b9bc30d9365965639aa` | none |
+| `paper_zen.uvfits` | 66 240 | `136e6beaf0c02e11b7bf3b4ad4a8eb4770e70158` | none |
+| `sampling_mean.fits` | 529 920 | `2689580af4d20ca33b98ac40afb2616423c6e920` | none |
+| `vis.fits` | 2 131 200 | `9869f076976bdc1881f3b7174311b0994d2d2b19` | none |
+| `vis_multichan.vis` | 826 560 | `70c38e69b4ff67f098aeffdf4cc0c26922097c21` | none |
+
+### Sources and what each file is for
+
+**`vis.fits`** — legacy VLBIFiles test fixture, original source not re-verified.
+UVFITS random groups written by AIPS (`ORIGIN = 'AIPSphys43 … 31DEC11'`), `TELESCOP = VLBA`,
+`OBSERVER = BL149CZ`, `DATE-OBS = 2010-12-24`, J1033+6051 at 15.33 GHz, `NAXIS = 7` with
+8 IFs × 1 channel × 4 Stokes, 5 082 groups, `AIPS NX/FQ/AN` present, all-zero `POLAA/POLAB`.
+*Serves:* the package's default UVFITS path end to end — `uvf simple` (uvtable values, baseline
+and frequency bookkeeping), `uvf antenna polarization`, `closures calculations`, `sources`,
+`uvtable_wide`, `coherencymatrices`, `lazycolumntable groupdata labeling`, `prefetch!`, and the
+three `grouphdu …` items, which copy it to a temporary file and delete `BSCALE`/`PSCAL4`/`PZERO6`
+from the copy to check the FITS defaults (the fixture itself is never modified).
+
+**`vis_multichan.vis`** — legacy VLBIFiles test fixture, original source not re-verified.
+AIPS UVFITS, `OBSERVER = BH019`, `DATE-OBS = 1996-06-05`, J0414+053A at 4.60 GHz, 8 IFs ×
+16 channels, 515 groups.
+*Serves:* the multi-channel window arithmetic (`uvf multichannel`, `frequency correctness
+CRPIX=1 multichan`) and the `.vis` extension branch of `guess_type`.
+
+**`BL146_1.fits`** — <https://fits.gsfc.nasa.gov/registry/fitsidi/BL146_1.fits>, the FITS-IDI
+registry sample of the NASA GSFC FITS Support Office (2 448 000 B, unchanged).
+VLBA hardware correlator, `ORIGIN = 'VLBA Correlator'`, `FXCORVER = 4.22`,
+`DATE-OBS = 2007-08-23`, 4 bands × 8 channels × 4 Stokes, 1 000 `UV_DATA` rows, and the full
+auxiliary set: `INTERFEROMETER_MODEL` (640), `MODEL_COMPS` (1 060), `PHASE-CAL` (241),
+`SYSTEM_TEMPERATURE` (398), `FLAG` (1 058), `WEATHER` (70), `GAIN_CURVE` (10),
+`TAPE_STATISTICS` (1 000), 0-row `SPACECRAFT_ORBIT`.
+*Serves:* the FITS-IDI reader wherever a two-polarization file is needed — `FITS IDI small`,
+`uvtable fitsidi`, `mmap column read`, `UV_DATA axis order`, `FITS-IDI auxiliary tables`,
+`RDATE fallback to ARRAY_GEOMETRY`, the `NO_POL = 2` control of the single-polarization item,
+the per-band `FLAG` widening path, and the one-HDU-per-name control of the e-MERLIN item.
+
+**`DDTSUVDATA.fits`** — <https://fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits> (596 160 B,
+unchanged). VLA, 3C161, `DATE-OBS = 29/01/84`, written by AIPS in 1995
+(`ORIGIN = 'AIPSRhesus NRAO/CV 580 15JUL95'`), 1.420 GHz, 28 antennas, 7 956 groups.
+`NAXIS = 6`: the axis set is COMPLEX/STOKES/FREQ/RA/DEC with **no IF axis at all**.
+*Serves:* `uvf NAXIS=6 no IF axis (DDTSUVDATA)` — the reader must synthesise the single
+frequency window instead of indexing a missing axis. Also the oldest date any fixture carries,
+which pins the two-digit-year `DD/MM/YY` date parsing.
+
+**`0332-391.uvfits`** —
+<https://github.com/astro-informatics/purify/raw/development/data/atca/0332-391.uvfits>
+(14 670 720 B, unchanged). ATCA, `DATE-OBS = 2001-05-20`, written by Miriad `atlod`/`fits`,
+1.432 GHz, 13 channels, Stokes I/Q/U/V, 6 antennas, 22 675 groups, **`CDELT4 < 0` with no
+`AIPS FQ` table**.
+*Serves:* `uvf NAXIS=6 no IF axis (ATCA)` — the sideband has to come from `sign(CDELT4)` when
+there is no FQ table, and UVFITS values stay verbatim (no conjugation) even so, unlike the
+FITS-IDI meaning of `sideband == -1`.
+
+**`mwa_1061316296.uvfits`** — <https://github.com/RadioAstronomySoftwareGroup/rasg-datasets>
+`v0.0.4/visibility_data/MWA/1061316296.uvfits`, renamed (1 529 280 B, unchanged).
+MWA, `DATE-OBS = 2013-08-23`, written by pyuvdata 2.1.3, 167.075 MHz, linear feeds
+(`XX/YY/XY/YX`), 16 256 groups, **every weight ≤ 0**.
+*Serves:* `uvf linear polarization (MWA)` — linear-feed Stokes labelling, and the
+all-flagged case in which `uvtable` legitimately comes out empty while `uvtable_wide` does not.
+
+**`paper_zen.uvfits`** — same repository,
+`v0.0.4/visibility_data/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits`, renamed (66 240 B,
+unchanged). PAPER, `DATE-OBS = 2014-07-27`, Miriad, 100 MHz, 11 channels, `NAXIS = 6`,
+a single `XY` product, 285 groups.
+*Serves:* `uvf NAXIS=6 linear pol (PAPER)`, and `faithful warnings` — the file that makes the
+reader warn exactly once about what it cannot represent faithfully.
+
+**`J1256-0547_X_2020_10_18_pet_vis.fits`** —
+<https://astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits> (236 160 B,
+unchanged). VLBA X-band, `DATE-OBS = 2020-10-18`, experiment `uh007b`, merged by
+`UVA_MERGE v 2.1`: **three `AIPS AN` tables** (subarrays 1, 2, 3) with 8, 9 and 10 antennas,
+1 132 groups.
+*Serves:* `uvf multi-array baselines` — the baseline number carries the subarray in its
+fractional part, so antenna lookup must pick the right array's table.
+
+**`SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits`** — legacy VLBIFiles test fixture from an
+EHT 2017 April public data release, original download not re-verified.
+`OBSERVER = EHT`, `DATE-OBS = 2017-04-11`, 3C279 at 229.07 GHz, HOPS → `netcal`, Stokes I only,
+14 455 groups, `AIPS AN` with 9 stations.
+*Serves:* `uvf EHT 2`, and the real-ECEF cross-check of `antenna catalog` (the SMT/`AZ` station
+position, geodetic → ECEF within 100 m).
+
+**`hops_3600_OJ287_LO+HI.medcal_dcal_full.uvfits`** — legacy VLBIFiles test fixture, EHT 2017
+April HOPS product, original download not re-verified. `DATE-OBS = 2017-04-09`, OJ 287 at
+227.07 GHz, the LO and HI bands as 2 IFs, 6 220 groups.
+*Serves:* `uvf EHT 1` — two-band EHT UVFITS, source coordinates from the header.
+
+**`datafile_01-01_230GHz.uvfits`** — legacy VLBIFiles test fixture, EHT 2013 campaign product,
+original download not re-verified. `DATE-OBS = 2013-01-01`, M87 at 230 GHz, 1 772 groups,
+`AIPS NX` present.
+*Serves:* `uvf EHT 3`.
+
+**`alist_v6.fsumm`** — legacy VLBIFiles test fixture, original source not re-verified.
+HOPS `alist` **version 6** fringe summary, header line `* This file processed by alist, Tue Jul
+26 09:28:16 2016`, 318 fringe records at ~228 GHz.
+*Serves:* the entire `Alist` reader — `alist` (column parsing, SNR/phase/delay fields, times)
+and the `.fsumm` branch of `guess_type`. The only alist fixture there is.
+
+**`map.fits`** — legacy VLBIFiles test fixture, original source not re-verified.
+512² CLEAN image of J0000+0248, `OBSERVER = bp192d3`, `DATE-OBS = 2016-01-03`, written by
+`PIMA v 2.26`, `BUNIT = JY/BEAM`, 0.2 mas pixels, with an `AIPS CC` table of **361** components.
+*Serves:* the image reader end to end — `img don't read data` (header-only load, beam),
+`img read data`, `img read clean` (CC table → `MultiComponentModel`),
+`img clean/residual/combined` (lazy vs materialised images), and the model round-trip in
+`difmap model`.
+
+**`map_stacked.fits`** — legacy VLBIFiles test fixture, original source not re-verified.
+512² stacked CLEAN image of J0738+17, `OBSERVER = BR034`, `DATE-OBS = 1996-01-19`, difmap →
+AIPS (`HISTORY DIFMAP Saved clean-map to fits file`), circular restoring beam and **no CC
+table** at all.
+*Serves:* `img stacked` — a stacked map has no component list, so the `MultiComponentModel`
+load must fail (the item's `@test_broken`), while the image itself reads.
+
+**`sampling_mean.fits`** — legacy VLBIFiles test fixture, original source not re-verified.
+256² map, `TELESCOP = 'VLBI'`, `OBJECT = 'Unknown'`, `BUNIT = 'JY/PIXEL'`, no `BMAJ`/`BMIN`
+cards, 0.003125° pixels — a mean uv-sampling map rather than a sky image.
+*Serves:* `img nonstandard header names` — axes and units must still read, and `beam` must
+report the missing `BMAJ` key rather than inventing one.
+
+**`difmap_model.mod`, `difmap_model_clean.mod`, `difmap_model_empty.mod`** — legacy VLBIFiles
+test fixtures, original source not re-verified. difmap model files: 4 components with
+`v`-marked free parameters and a `SpecIndex` column; 631 delta components; and a file with a
+phase-centre comment and nothing else.
+*Serves:* `difmap model` — reading all three, the concrete `Point` element type of the clean
+one, the empty case, and save/load round-trips through `tempname()`.
+
+---
+
 ## Totals
 
 | directory | files | bytes |
@@ -303,8 +460,9 @@ here — and it is the counterexample to any "descending `PC_FREQ` means LSB" he
 | `jive/` | 2 | 79 496 640 |
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 8 | 194 777 280 |
+| `pkg-data/` | 18 | 28 705 690 |
 | `scripts/` | 4 | 42 189 |
-| **total (data + scripts)** | **20 + 4** | **499 834 509 B ≈ 499.8 MB** |
+| **total (data + scripts)** | **38 + 4** | **528 540 199 B ≈ 528.5 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.

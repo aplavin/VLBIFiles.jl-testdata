@@ -12,9 +12,19 @@ lower-sideband conventions, single-polarization auxiliary tables, duplicated tab
 zero-based axes, negative bandwidths — instead of against fixtures written by the same
 assumptions the reader is being tested for.
 
-The files are too large, and too numerous, to live inside the package repository, so the
-gated testitems in `VLBIFiles.jl/test/runtests.jl` look for a clone of this repository
-through `VLBIFILES_TEST_*` environment variables and skip themselves when it is absent.
+`pkg-data/` is the one directory with a different history: it holds the fixtures that lived in
+`VLBIFiles.jl/test/data/` since the package began, moved here so that the package repository
+carries no data at all. They are real files too — real visibilities, and real *products* of
+real data (CLEAN images, difmap models, a fourfit alist summary, a mean uv-sampling map), which
+raw correlator output is not. Six of them have an exact source URL, recorded below; the rest are
+long-standing fixtures whose original download was never recorded, and they are marked as such
+rather than given a plausible-looking provenance.
+
+The files are too large, and too numerous, to live inside the package repository, so the test
+suite of VLBIFiles.jl clones this repository into `VLBIFiles.jl/test/VLBIFiles.jl-testdata/`
+the first time a testitem needs a file, and uses an existing directory there as it is — no
+fetch, no update. `VLBIFILES_TESTDATA` points at an existing checkout instead. Testitems whose
+files are absent (no checkout and no network) skip themselves with a message.
 
 ## The verbatim-subset excerpt
 
@@ -109,6 +119,41 @@ table set — `PHASE-CAL` (`NO_TONES = 3`, non-monotonic tone frequencies), `SYS
 | `sma_masses/Per35.SWARM.1.3mm.s1.usb.1.151006.uvfits` | [Harvard Dataverse datafile 3616842](https://dataverse.harvard.edu/api/access/datafile/3616842), same dataset | 36 253 440 / `5eed0adc47d3d5e29d45b8d6d452d9b2d655a740` | none | 36 253 440 / `5eed0adc47d3d5e29d45b8d6d452d9b2d655a740` | the all-positive upper-sideband twin of the file above, its control |
 | `sma_masses/SVS13C.sub.SWARM.lsb.s3.170127.excerpt.uvfits` | [Harvard Dataverse datafile 3175052](https://dataverse.harvard.edu/api/access/datafile/3175052), dataset [10.7910/DVN/GQTCQR](https://doi.org/10.7910/DVN/GQTCQR) | 263 531 520 / `abdc3e5b75b21a5979e486deb79fc1f56a02ca6e` | excerpt, 152 of 1 340 groups | 29 923 200 / `a1fc17cfc91a0b075b54f09174088a4a24c9a684` | same testitem: 16 384 channels, `CH WIDTH < 0`, `TOTAL BANDWIDTH < 0`, `SIDEBAND = -1` |
 
+### `pkg-data/` — the package's own fixtures, moved out of `VLBIFiles.jl/test/data/`
+
+Eighteen small files (28 705 690 B together) that VLBIFiles.jl has always tested against: the
+UVFITS/FITS-IDI readers, the image and difmap-model readers, the alist reader. They are
+unchanged — copied byte for byte out of the package repository, no excerpting, no rewriting —
+and the "source URL" column says what is *known* about each. Six were fetched on demand by the
+test suite itself, so their URL is recorded in the code that fetched them; the rest predate any
+such record and say so.
+
+| file | bytes / SHA1 | source | what it is / used by |
+|---|---|---|---|
+| `vis.fits` | 2 131 200 / `9869f076976bdc1881f3b7174311b0994d2d2b19` | legacy VLBIFiles test fixture, original source not re-verified | VLBA 15 GHz, `BL149CZ` 2010-12-24, J1033+6051, AIPS UVFITS, 8 IFs × 1 channel × 4 Stokes, 5 082 groups — the main UVFITS fixture (`uvf simple`, `closures calculations`, the three `grouphdu …` items, `uvtable_wide`, `prefetch!`, …) |
+| `vis_multichan.vis` | 826 560 / `70c38e69b4ff67f098aeffdf4cc0c26922097c21` | legacy VLBIFiles test fixture, original source not re-verified | VLBA 4.6 GHz, `BH019` 1996-06-05, J0414+053A, 8 IFs × 16 channels, 515 groups — `uvf multichannel`, `frequency correctness CRPIX=1 multichan` |
+| `BL146_1.fits` | 2 448 000 / `f4ab6eea1ece41483b3dc5ec247d69c342be633c` | [`fits.gsfc.nasa.gov/registry/fitsidi/BL146_1.fits`](https://fits.gsfc.nasa.gov/registry/fitsidi/BL146_1.fits) (NASA GSFC FITS Support Office, FITS-IDI registry sample) | VLBA hardware correlator (`FXCORVER = 4.22`) 2007-08-23, 4 bands × 8 channels × 4 Stokes, 1 000 rows, full aux-table set — the FITS-IDI fixture of `FITS IDI small`, `FITS-IDI auxiliary tables`, `mmap column read`, `RDATE fallback…`, and the two-polarization control of `FITS-IDI single-polarization aux tables (NO_POL=1)` |
+| `DDTSUVDATA.fits` | 596 160 / `12e46c6deefa634b96065ed461e93d9d4eb1392c` | [`fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits`](https://fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits) | VLA 3C161, 1984-01-29, written by AIPS; `NAXIS = 6`, i.e. **no IF axis**, 28 antennas, 7 956 groups — `uvf NAXIS=6 no IF axis (DDTSUVDATA)` |
+| `0332-391.uvfits` | 14 670 720 / `7e4e2a73864816ee1a21adfa0ba850e04df49da0` | [`purify/data/atca/0332-391.uvfits`](https://github.com/astro-informatics/purify/raw/development/data/atca/0332-391.uvfits) | ATCA 1.43 GHz 2001-05-20, Miriad `atlod`/`fits`; `NAXIS = 6`, descending `CDELT4` with no FQ table, Stokes I/Q/U/V, 13 channels — `uvf NAXIS=6 no IF axis (ATCA)` |
+| `mwa_1061316296.uvfits` | 1 529 280 / `947eb742ae446f7414e43b9bc30d9365965639aa` | [`rasg-datasets v0.0.4 …/MWA/1061316296.uvfits`](https://github.com/RadioAstronomySoftwareGroup/rasg-datasets/raw/v0.0.4/visibility_data/MWA/1061316296.uvfits) (renamed) | MWA 167 MHz 2013-08-23, written by pyuvdata; linear feeds, every visibility flagged — `uvf linear polarization (MWA)` |
+| `paper_zen.uvfits` | 66 240 / `136e6beaf0c02e11b7bf3b4ad4a8eb4770e70158` | [`rasg-datasets v0.0.4 …/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits`](https://github.com/RadioAstronomySoftwareGroup/rasg-datasets/raw/v0.0.4/visibility_data/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits) (renamed) | PAPER 100 MHz 2014-07-27, Miriad; `NAXIS = 6`, single `XY` product, 11 channels — `uvf NAXIS=6 linear pol (PAPER)`, `faithful warnings` |
+| `J1256-0547_X_2020_10_18_pet_vis.fits` | 236 160 / `daa9bd688580ab5016caa2708ae57d24b8ca9fed` | [`astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits`](https://astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits) | VLBA X-band 2020-10-18 (`uh007b`), merged by `UVA_MERGE 2.1`: **three `AIPS AN` tables**, i.e. three subarrays in one file — `uvf multi-array baselines` |
+| `SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits` | 1 238 400 / `98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5` | EHT 2017 April public data release, HOPS/`netcal` product; legacy VLBIFiles test fixture, original download not re-verified | EHT 229 GHz 2017-04-11, 3C279, Stokes I, 14 455 groups — `uvf EHT 2`, `antenna catalog` (real ECEF cross-check) |
+| `hops_3600_OJ287_LO+HI.medcal_dcal_full.uvfits` | 794 880 / `02bb180639a3dad2233be7d867a44ed9f2d4f57c` | EHT 2017 April HOPS product; legacy VLBIFiles test fixture, original download not re-verified | EHT 227 GHz 2017-04-09, OJ 287, LO+HI bands (2 IFs), 6 220 groups — `uvf EHT 1` |
+| `datafile_01-01_230GHz.uvfits` | 178 560 / `c1ae1e63c2c297a9442a9eb57d28fee0c8e9694c` | EHT 2013 campaign product; legacy VLBIFiles test fixture, original download not re-verified | EHT 230 GHz 2013-01-01, M87, 1 772 groups — `uvf EHT 3` |
+| `alist_v6.fsumm` | 127 814 / `77226072ae5dba628e2e855f68c130f2356c69f8` | HOPS `alist` version-6 fringe summary (header: processed 2016-07-26); legacy VLBIFiles test fixture, original source not re-verified | 318 fringe records, 228 GHz — the only fixture of the `Alist` reader (`alist`, `generic loading`) |
+| `map.fits` | 1 071 360 / `9cba0872d2d8ea73bcc56dfdc84dbbfef7c5ad87` | legacy VLBIFiles test fixture, original source not re-verified | 512² CLEAN image of J0000+0248 (`bp192d3`, 2016-01-03) written by `PIMA 2.26`, with an `AIPS CC` table of 361 components — the image fixture (`img read data`, `img read clean`, `img clean/residual/combined`, `difmap model`) |
+| `map_stacked.fits` | 2 234 880 / `132092bcf885761e3e88388ef1cb437407850e4b` | legacy VLBIFiles test fixture, original source not re-verified | 512² stacked CLEAN image, J0738+17 (`BR034`, 1996-01-19), difmap → AIPS, circular beam, **no CC table** — `img stacked` |
+| `sampling_mean.fits` | 529 920 / `2689580af4d20ca33b98ac40afb2616423c6e920` | legacy VLBIFiles test fixture, original source not re-verified | 256² mean uv-sampling map, `TELESCOP = 'VLBI'`, `OBJECT = 'Unknown'`, `JY/PIXEL`, no `BMAJ` — the nonstandard-header image case (`img nonstandard header names`) |
+| `difmap_model.mod` | 532 / `7520d0c60635a889c766ba7b8e1cd4427c70715d` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file, 4 components with `v`-marked free parameters — `difmap model`, `generic loading` |
+| `difmap_model_clean.mod` | 24 964 / `80163e3eea24b0dc4489465bf81178d0b64566e4` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file, 631 delta components — `difmap model` |
+| `difmap_model_empty.mod` | 60 / `463d1702e22794fc0b1b68b86a6dd8e3cd6b5218` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file with a phase-centre line and no components — `difmap model`, `generic loading` |
+
+Three further fixtures are referenced by the test suite under `pkg-data/` but are **not**
+published here — `M87_EHT_2018_3644_b3.fits`, `GOALS_GroupS2_Ref59_Cals_Avg.idi` and
+`J0840-5732_X_2010_03_11_dew_map.fits`. Their testitems skip themselves unless the file is
+dropped into `pkg-data/` by hand, exactly as they did while the package still had a `test/data/`.
+
 `scripts/` (4 files) holds `trim_idifits.py`, `trim_uvfits_groups.py`, `verify_excerpt.py` and
 `MAKE.sh`; they are documentation and reproduction tools, not data.
 
@@ -154,6 +199,23 @@ re-publication of anyone's science.
   the VLBA correlation done at NRAO.
 * **MPIfR** — `misc/K08161.0.FITS`, a member of the DiFX 1.5.0 test-data tarball on the MPIfR
   public VLBI archive <https://ftp.mpifr-bonn.mpg.de/vlbiarchive/DiFX_testdata/>.
+* **`pkg-data/`**, the fixtures moved out of the package repository. Where the source is known
+  it is: **NASA GSFC FITS Support Office** sample files (`BL146_1.fits` from the FITS-IDI
+  registry, `DDTSUVDATA.fits` from the samples directory, <https://fits.gsfc.nasa.gov/>);
+  **astrogeo.org** (`J1256-0547_X_2020_10_18_pet_vis.fits`, credit the archive as above);
+  the **purify** project's ATCA example (`0332-391.uvfits`,
+  <https://github.com/astro-informatics/purify>, observed by the ATCA, an Australia Telescope
+  National Facility instrument); and the **Radio Astronomy Software Group**'s `rasg-datasets`
+  (`mwa_1061316296.uvfits`, `paper_zen.uvfits`,
+  <https://github.com/RadioAstronomySoftwareGroup/rasg-datasets>, MWA and PAPER data
+  redistributed there for pyuvdata's test suite). The three EHT files
+  (`SR1_3C279_…`, `hops_3600_OJ287_…`, `datafile_01-01_230GHz.uvfits`) are products of **Event
+  Horizon Telescope** observations — they came into the package before any download record was
+  kept, so the exact release they were taken from is stated as unverified rather than guessed;
+  publications using EHT data should follow the collaboration's own acknowledgment policy
+  (<https://eventhorizontelescope.org/>). The remaining files (`vis.fits`, `vis_multichan.vis`,
+  `map*.fits`, `sampling_mean.fits`, `difmap_model*.mod`, `alist_v6.fsumm`) are VLBA/VLBI
+  products of the same kind with no recorded provenance; the VLBA is an NRAO facility.
 
 ## Reproducing and checking
 
