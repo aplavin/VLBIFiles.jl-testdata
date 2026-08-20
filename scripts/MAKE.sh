@@ -10,14 +10,16 @@
 # UVFITS `GCOUNT`) is rewritten.  `verify_excerpt.py FULL EXCERPT` re-proves that property.
 #
 #   requirements: python3.11, astropy >= 6, numpy >= 1.24, curl
-#   usage:        SRC=/some/scratch/dir sh MAKE.sh          (needs ~17 GB of scratch)
+#   usage:        SRC=/some/scratch/dir sh MAKE.sh          (needs ~18 GB of scratch)
 #
 # The excerpts committed here were built with python 3.11.11, astropy 8.0.1 and numpy 2.2.5.
-# Three of the calls below rank source-blocks by amplitude (--blocks > 0) and probe them with
+# Four of the calls below rank source-blocks by amplitude (--blocks > 0) and probe them with
 # rows drawn from numpy's default_rng, so which rows they keep depends on the seed; `--seed 0`
 # is written out there rather than left to trim_idifits.py's default, which is the same 0.
+# (`--blocks 0` never touches the generator at all, so those calls are seed-independent.)
 # Checked 2026-08-19: bd152ie rebuilt with the explicit flag is byte-identical to the excerpt
-# committed here.
+# committed here; so is V389B rebuilt from a freshly downloaded Pawsey copy, and so is BK255AQ
+# cut twice from the same pre-staged original.
 #
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -85,10 +87,12 @@ $VERIFY "$SRC/VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.idifits" \
 #   2008_05_04_bw089_04.fits     http://astrogeo.org/s0/vlba_fits/bw089/2008_05_04_bw089_04.fits
 
 # =====================================================================================
-# vlba-difx/ — NRAO archive.  These two are NOT plain URLs: they come from an anonymous
-# staging request at https://data.nrao.edu/portal/ (see MANIFEST.md for the product
-# locators).  Point $SRC at the downloaded .idifits and the commands below reproduce the
-# published excerpts bit for bit (SHA1s in MANIFEST.md).
+# vlba-difx/ — VLBA correlator output.  None of these three is a plain URL: BL178AC and
+# BL178AL come from an anonymous staging request at https://data.nrao.edu/portal/ (see
+# MANIFEST.md for the product locators), and BK255AQ is a January 2026 observation whose
+# original is held by the project owner and has no public download at all.  Point $SRC at
+# the .idifits files and the commands below reproduce the published excerpts bit for bit
+# (SHA1s in MANIFEST.md); each is skipped with a message when its original is not staged.
 # The --anchor windows are exactly the scans the gated VLBIFiles.jl testitems name.
 # =====================================================================================
 AC="$SRC/VLBA_BL178AC_bl178ac_BIN0_SRC0_0_111228T171125.idifits"
@@ -111,6 +115,45 @@ if [ -f "$AL" ]; then
 else
     echo "skip BL178AL: $AL not present (NRAO staging request required)"
 fi
+
+# --- BK255AQ : DiFX-2.9, the full modern aux-table set, 46.9 GB ---
+# Nothing but the auxiliary tables is wanted here (INTERFEROMETER_MODEL 11.5 MB, PHASE-CAL
+# 8.8 MB, MODEL_COMPS 1.9 MB, SYSTEM_TEMPERATURE, FLAG, WEATHER, GAIN_CURVE, CALC — 25.4 MB
+# together, kept whole and byte-identical), so the UV_DATA subset is only wide enough to keep
+# the container honest: every 40 000th row, 36 of 1 425 762.  No amplitude ranking and no
+# sparse filler, i.e. the selection reads no visibility values and uses no random generator.
+AQ="$SRC/VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.idifits"
+if [ -f "$AQ" ]; then
+    $TRIM_IDI "$AQ" \
+        "$ROOT/vlba-difx/VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.excerpt.idifits" \
+        --blocks 0 --no-sparse --keep '*%40000' --seed 0
+    $VERIFY "$AQ" \
+        "$ROOT/vlba-difx/VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.excerpt.idifits"
+else
+    echo "skip BK255AQ: $AQ not present (original held by the project owner, pre-stage it)"
+fi
+
+# =====================================================================================
+# misc/V389B.0.excerpt.FITS — Pawsey Data Portal (Mediaflux), the LBA archive.  Not a plain
+# URL either: the store hands anonymous callers a session key (domain/user/password all
+# `public`) and then serves content by asset id — V389B.0.FITS is asset 4616273, path
+# /VLBI/Archive/LBA/v389/v389b/V389B.0.FITS.  A session expires after 1800 s, and the store
+# is tape-backed, so the first read of a cold asset can stall for minutes.
+# =====================================================================================
+V389B="$SRC/V389B.0.FITS"
+if [ ! -f "$V389B" ]; then
+    SKEY=$(curl -s -X POST -H 'Content-Type: text/xml' \
+        -d '<request><service name="system.logon"><args><domain>public</domain><user>public</user><password>public</password></args></service></request>' \
+        https://data.pawsey.org.au/__mflux_svc__ \
+        | tr -d '\n' | sed -e 's/.*<session[^>]*>//' -e 's|</session>.*||')
+    curl -L -o "$V389B" \
+        "https://data.pawsey.org.au/mflux/content.mfjp?_skey=$SKEY&filename=V389B.0.FITS&id=4616273"
+fi
+# 551.6 MB, of which 550.0 MB is UV_DATA: the whole 1.6 MB of auxiliary tables is kept and
+# every 160th visibility row with it, 209 of 33 408, which is the 5 MB budget.
+$TRIM_IDI "$V389B" "$ROOT/misc/V389B.0.excerpt.FITS" \
+    --target-mb 5 --blocks 1 --nbl 1 --nauto 1 --seed 0
+$VERIFY "$V389B" "$ROOT/misc/V389B.0.excerpt.FITS"
 
 # =====================================================================================
 # misc/ — UVFITS random-groups files.  trim_idifits.py does NOT apply to these: the

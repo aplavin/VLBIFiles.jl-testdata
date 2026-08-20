@@ -18,7 +18,7 @@ The two cutting tools and the checker live in `scripts/`:
 | `verify_excerpt.py` | re-proves the guarantee: hashes everything outside the trimmed segment of the full file and of the excerpt and diffs the trimmed HDU's header card by card |
 | `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` from its tarball and checks it against `SHA1SUMS` |
 
-`verify_excerpt.py` was run on all nine excerpts below; all nine report
+`verify_excerpt.py` was run on all eleven excerpts below; all eleven report
 **`VERDICT: verbatim subset`** with exactly one differing card.
 
 `README.md` is the front page: it lists every file with its source URL, original size and
@@ -122,10 +122,11 @@ rows is the whole 40 MB budget. `PHASE-CAL`(12 494), `FLAG`(3 864), `SYSTEM_TEMP
 
 ---
 
-## `vlba-difx/` — NRAO archive (anonymous staging request, not a plain URL)
+## `vlba-difx/` — VLBA correlator output, none of it behind a plain URL
 
 | file | bytes | staged SHA1 | transformation |
 |---|---|---|---|
+| `VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.excerpt.idifits` | 26 576 640 | `df4348587acefc8d2ff627fdc33c8bec7d896dd4` | verbatim subset of `UV_DATA` rows, 36 of 1 425 762; all other HDUs byte-identical; one card (`NAXIS2`) rewritten |
 | `VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.excerpt.idifits` | 50 005 440 | `e51d5eb5c767a7788f4489a509cf8124acd4dfd2` | verbatim subset of `UV_DATA` rows, 3 801 of 1 162 555; all other HDUs byte-identical; one card (`NAXIS2`) rewritten |
 | `VLBA_BL178AC_bl178ac_BIN0_SRC0_0_111228T171125.excerpt.idifits` | 60 004 800 | `490eac599ad4f7b527a0f77f398a0f5c778dc109` | verbatim subset of `UV_DATA` rows, 5 797 of 1 385 432; all other HDUs byte-identical; one card (`NAXIS2`) rewritten |
 
@@ -155,6 +156,39 @@ Same MOJAVE 8×LSB/USB setup, `CORRVERS = DIFX-2.1`.
 BL178AC's −0.99), i.e. the DiFX-2.1 fix. The `--anchor` keeps in full the 0923+392 scan
 (FD–LA, 2012-06-25 23:30:44…23:36:30, 111 records) that the gated testitem names.
 
+**`…BK255AQ…excerpt.idifits`** — source
+`VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.idifits`, 46 904 448 960 B, SHA1
+`1133b121741a259ca2d58a7776c2e00cd96474b7`. Unlike the two BL178 files this one has no
+archive request behind it either: it is **VLBA project BK255AQ, an observation of this
+repository's owner**, observed 2026-01-09 and correlated 2026-01-27 — too recent to be public,
+so the original is held by the project owner and `MAKE.sh` skips the file with a message when
+it is not pre-staged, exactly as it does for the two files that need an NRAO staging request.
+The primary header is `ORIGIN = 'VLBA Correlator'`, `CORRELAT = 'DIFX'`,
+`TELESCOP = 'VLBA'`, `OBSERVER = 'BK255AQ'`, `DATE-OBS = '2026-01-09'`,
+`DATE-MAP = '2026-01-27'`, and its `HISTORY` block carries the difx2fits provenance verbatim:
+`OPENED FITS FILE : 2026JAN27 22h40m23.63s`, `CORRVERS = DIFX-2.9.0`,
+`CORRLABL = VLBADIFX8-290`, `OBSCODE : BK255AQ`, `JOBSTART : 2026JAN09  6h13m59.00s`.
+10 VLBA antennas (BR FD HN KP LA MK NL OV PT SC), 40 sources, `REF_FREQ = 15.11225 GHz`,
+`NO_BAND = 4` × `NO_CHAN = 256` × 4 Stokes, every band `SIDEBAND = +1` — DiFX ≥ 2.2 never
+writes `-1` at all.
+*Serves:* the **modern-DiFX auxiliary-table reference**, and the only file here with the
+complete 2.9-era set. `INTERFEROMETER_MODEL` and `MODEL_COMPS` have 11 196 rows each on a
+725-point 120 s grid that runs past midnight without resetting, and their polynomials
+decompose exactly (total = geometry + atmosphere − clock, to 1e-17 s) — the `FITS-IDI model
+tables (BK255AQ)` testitem. `PHASE-CAL` has 18 159 rows with `NO_TONES = 2` 95 MHz apart and
+`CABLE_CAL` NaN on the last record of every scan (3 298 of them), `SYSTEM_TEMPERATURE`
+15 909, `FLAG` 12 977, `WEATHER` 2 858 (with MK's dead met sensors written as all-zero
+records), `GAIN_CURVE` 10 — the `FITS-IDI instrumental tables (BK255AQ)` testitem. Both
+testitems read only these tables, never a visibility.
+*Excerpt:* every 40 000th `UV_DATA` row, 36 of 1 425 762 — enough to keep the container
+honest and no more, because at 32 880 B a row the 46.9 GB of this file is 99.95 % `UV_DATA`
+and none of it is what the file is here for. The selection reads no visibility values and
+uses no random generator (`--blocks 0 --no-sparse`), so it is fixed by the flags alone.
+`INTERFEROMETER_MODEL` (11.47 MB), `PHASE-CAL` (8.80 MB), `MODEL_COMPS` (1.89 MB),
+`SYSTEM_TEMPERATURE` (1.47 MB), `FLAG` (1.46 MB), `WEATHER` (0.13 MB), `GAIN_CURVE`, `CALC`,
+`ANTENNA`, `ARRAY_GEOMETRY`, `SOURCE`, `FREQUENCY` and the 86 400 B primary `HISTORY` block
+are all byte-identical to the full file — 25.4 MB of the 26.6 MB published here.
+
 > **Size note.** The BL178AC excerpt is 60.0 MB, above GitHub's 50 MB *warning* threshold
 > (well below the 100 MB hard block). A proven 38.0 MB alternative exists with the same anchor
 > scan (`--target-mb 38 --blocks 2 --nbl 2 --nauto 2`, SHA1
@@ -164,12 +198,13 @@ BL178AC's −0.99), i.e. the DiFX-2.1 fix. The `--anchor` keeps in full the 0923
 
 ---
 
-## `misc/` — UVFITS random-groups files and two small FITS-IDI files
+## `misc/` — UVFITS random-groups files and three small FITS-IDI files
 
 | file | bytes | staged SHA1 | transformation |
 |---|---|---|---|
 | `K08161.0.FITS` | 216 000 | `8628431e8fd0a94e006818bee3d29b294957ff15` | none |
 | `emerlin_multiuv.IDI1` | 2 128 320 | `811e6008d39087a58f9b238b3072b54fcc57b7bd` | none |
+| `V389B.0.excerpt.FITS` | 5 014 080 | `35e97982c1e362ca211c246f10af20b1bad8aecf` | verbatim subset of `UV_DATA` rows, 209 of 33 408; all other HDUs byte-identical; one card (`NAXIS2`) rewritten |
 | `05BBA01_VENUS22.LTA_LL.1FITS.excerpt.fits` | 30 000 960 | `cbba34afa74bd8d8318a0252f720fe7f7d5509ea` | verbatim subset of random groups, 19 112 of 339 300; all table HDUs byte-identical; one card (`GCOUNT`) rewritten |
 | `05BBA01_VENUS22.LTB_LL.1FITS.excerpt.fits` | 30 000 960 | `c2299f8eaa4b4674b7cb5925ab4428fa1ee80ede` | verbatim subset of random groups, 19 112 of 339 300; all table HDUs byte-identical; one card (`GCOUNT`) rewritten |
 | `mirsplit.excerpt.UVFITS` | 30 000 960 | `11d538fa7f66d588d83cf75c13c96860906508bf` | verbatim subset of random groups, 3 983 of 18 000; all table HDUs byte-identical; one card (`GCOUNT`) rewritten |
@@ -193,6 +228,33 @@ single polarization, no PHASE-CAL.
 *Serves:* the "DiFX file that does not identify its version" branch of the correlator-version
 logic, and the `NO_POL = 1` reader paths. Its 60 UV rows are too few for a delay statistic —
 that is a property of the published file, not of anything done here.
+
+**`V389B.0.excerpt.FITS`** — asset **4616273**,
+`/VLBI/Archive/LBA/v389/v389b/V389B.0.FITS` in the Pawsey Data Portal (Mediaflux) LBA
+archive; original 551 603 520 B, original SHA1 `1b27ea9ca0dcff3ace9991443616a2200a9e2255`.
+Anonymously downloadable, but not through a plain URL: the store issues a session key to a
+`public`/`public`/`public` logon and then serves content by asset id — the two calls are
+scripted in `MAKE.sh`, and the store is tape-backed, so a cold first read can stall minutes.
+LBA (Australian Long Baseline Array) antennas **AT HO MP PA**, `OBSERVER = 'V389B'`,
+`DATE-OBS = '2011-08-12'`, SN 1987A and three calibrators, `REF_FREQ = 1.368 GHz`,
+`NO_BAND = 2` × `NO_CHAN = 256` × 4 Stokes, correlated at the VLBA correlator
+(`ORIGIN = 'VLBA Correlator'`, `CORRELAT = 'DIFX'`) and written 2011-12-17 by a difx2fits that
+spelled its version **`CORRVERS = DiFX-1.5.4`**, in that mixed case. `FREQUENCY` is the
+mixed-sideband case: both bands `CH_WIDTH = +250 000` and `TOTAL_BANDWIDTH = +64 000 000`,
+but `SIDEBAND = [+1, −1]`. The file has **no `PHASE-CAL` table** — nor `FLAG`,
+`SYSTEM_TEMPERATURE`, `WEATHER` or `GAIN_CURVE`: its nine HDUs are `PRIMARY`,
+`ARRAY_GEOMETRY`, `SOURCE`, `ANTENNA`, `FREQUENCY`, `INTERFEROMETER_MODEL` (1 948 rows),
+`CALC` (5), `MODEL_COMPS` (1 948) and `UV_DATA`.
+*Serves:* the `FITS-IDI LBA file, no PHASE-CAL table (V389B)` testitem — the `DiFX-1.5.4`
+spelling must still parse to `v"1.5.4"` and so fall below the DiFX 2.1 `PHASE-CAL` fixes, and
+a file with a lower-sideband band but no tone table at all must fail `phase_cal` with the
+plain "No PHASE-CAL table" error rather than anything about sidebands, while the tables it
+does have (`INTERFEROMETER_MODEL`) still read. Its LSB band carries only zeros, so the
+testitem asserts metadata and not visibilities.
+*Excerpt:* every 160th `UV_DATA` row, 209 of 33 408 — 10 baselines, 3 sources, 55
+autocorrelations. The file is 99.7 % `UV_DATA`, so the 1.6 MB of tables the testitem reads
+(`FREQUENCY`, `ARRAY_GEOMETRY`, `SOURCE`, `ANTENNA`, `INTERFEROMETER_MODEL`, `MODEL_COMPS`,
+`CALC`, and the primary `HISTORY` block that carries `CORRVERS`) are all byte-identical here.
 
 **`05BBA01_VENUS22.LTA_LL.1FITS.excerpt.fits`** —
 <https://zenodo.org/records/4529203/files/05BBA01_VENUS22.LTA_LL.1FITS.fits?download=1>
@@ -504,13 +566,13 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | directory | files | bytes |
 |---|---|---|
 | `astrogeo/` | 7 | 113 808 960 |
-| `vlba-difx/` | 2 | 110 010 240 |
+| `vlba-difx/` | 3 | 136 586 880 |
 | `jive/` | 2 | 79 496 640 |
 | `vsop/` | 1 | 1 699 200 |
-| `misc/` | 8 | 194 777 280 |
+| `misc/` | 9 | 199 791 360 |
 | `pkg-data/` | 20 | 30 358 810 |
-| `scripts/` | 4 | 43 362 |
-| **total (data + scripts)** | **40 + 4** | **530 194 492 B ≈ 530.2 MB** |
+| `scripts/` | 4 | 46 196 |
+| **total (data + scripts)** | **42 + 4** | **561 788 046 B ≈ 561.8 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.

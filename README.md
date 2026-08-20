@@ -28,7 +28,7 @@ Testitems whose files are absent (no checkout and no network) skip themselves wi
 
 ## The verbatim-subset excerpt
 
-Nine files were too large to publish whole (up to 9.7 GB), so this repository carries an
+Eleven files were too large to publish whole (up to 46.9 GB), so this repository carries an
 **excerpt**: a copy of the published file in which the visibility container holds only a
 subset of the records — each record copied **byte for byte**, in the original order — and in
 which exactly **one header card** was rewritten, the record count of that container
@@ -66,23 +66,35 @@ rdv87 keeps the whole FD–PT scan on source 34 (2011-06-29 04:37:43…04:43:11)
 autocorrelations plus a 1-in-2111 sample of everything else; bd152ie keeps the two strongest
 source-blocks plus a 1-in-26 sample.
 
-### `vlba-difx/` — NRAO VLBA archive (MOJAVE project BL178)
+### `vlba-difx/` — VLBA correlator output (MOJAVE project BL178, and BK255AQ)
 
-Both files come from <https://data.nrao.edu/portal/>, which serves them only through an
-anonymous **staging request** — there is no direct URL. Give the portal the product locator
+The two BL178 files come from <https://data.nrao.edu/portal/>, which serves them only through
+an anonymous **staging request** — there is no direct URL. Give the portal the product locator
 below (or search the project code), and it stages the original file and a `SHA1SUMS` at a
 request-scoped `https://dl-dsoc.nrao.edu/anonymous/<request>/…` location that expires.
+BK255AQ has no download at all: it is this repository owner's own VLBA observation, correlated
+in January 2026 and too recent to be public, so its original is held by the project owner and
+`MAKE.sh` skips it unless the file is pre-staged — the same as the BL178 pair, which `MAKE.sh`
+also cannot fetch on its own.
 
 | file | original file name / locator | orig size / SHA1 | done | staged size / SHA1 | used by |
 |---|---|---|---|---|---|
+| `VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.excerpt.idifits` | `VLBA_BK255AQ_bk255aq_BIN0_SRC0_0_260127T224017.idifits`, experiment **BK255AQ**, no public locator — original held by the project owner | 46 904 448 960 / `1133b121741a259ca2d58a7776c2e00cd96474b7` | excerpt, 36 of 1 425 762 `UV_DATA` rows | 26 576 640 / `df4348587acefc8d2ff627fdc33c8bec7d896dd4` | `FITS-IDI model tables (BK255AQ)`, `FITS-IDI instrumental tables (BK255AQ)` |
 | `VLBA_BL178AC_bl178ac_BIN0_SRC0_0_111228T171125.excerpt.idifits` | `VLBA_BL178AC_bl178ac_BIN0_SRC0_0_111228T171125.idifits`, experiment **BL178AC**, `uid://vlba/correlation/fd2b205c-0f70-40a6-847e-1198becf2bf0` | 5 953 806 720 / `5d6515577b94107445719c3a0619830953292ef9` | excerpt, 5 797 of 1 385 432 `UV_DATA` rows | 60 004 800 / `490eac599ad4f7b527a0f77f398a0f5c778dc109` | `FITS-IDI lower-sideband acceptance (BL178AC)` |
 | `VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.excerpt.idifits` | `VLBA_BL178AL_bl178al_BIN0_SRC0_0_120712T141309.idifits`, experiment **BL178AL**, `uid://vlba/correlation/7c866aab-9bc3-40a4-ac54-b78f3dd2aa22` | 5 000 201 280 / `cdc2f0270fbf576380dac033c8aabb398018e3df` | excerpt, 3 801 of 1 162 555 `UV_DATA` rows | 50 005 440 / `e51d5eb5c767a7788f4489a509cf8124acd4dfd2` | `FITS-IDI lower-sideband acceptance, DiFX 2.1 (BL178AL)` |
 
-The two are the same MOJAVE 15 GHz 8×LSB/USB setup five months apart, differing in the
-difx2fits release that wrote them (`CORRVERS = DIFX-2.0.1` vs `DIFX-2.1`) — which is exactly
+The two BL178 files are the same MOJAVE 15 GHz 8×LSB/USB setup five months apart, differing in
+the difx2fits release that wrote them (`CORRVERS = DIFX-2.0.1` vs `DIFX-2.1`) — which is exactly
 the distinction the `PHASE-CAL` version gate is about. Each excerpt keeps in full the scan its
 testitem names: BL178AC the 3C 84 scan KP–LA 2011-12-12 02:09:30…02:12:44, BL178AL the
 0923+392 scan FD–LA 2012-06-25 23:30:44…23:36:30.
+
+BK255AQ is a modern `DIFX-2.9.0` file (10 VLBA antennas, 15.1 GHz, 4 bands × 256 channels, all
+upper sideband) carried here for its **auxiliary tables**, which the excerpt keeps whole and
+byte-identical: `INTERFEROMETER_MODEL` and `MODEL_COMPS` with 11 196 rows each on a 725-point
+120 s grid, `PHASE-CAL` 18 159, `SYSTEM_TEMPERATURE` 15 909, `FLAG` 12 977, `WEATHER` 2 858,
+`GAIN_CURVE` 10, `CALC` 5 — 25.4 MB of the 26.6 MB published. Its two testitems read no
+visibility at all, which is why 36 `UV_DATA` rows are enough.
 
 ### `jive/` — EVN, correlated at JIVE
 
@@ -112,6 +124,7 @@ table set — `PHASE-CAL` (`NO_TONES = 3`, non-monotonic tone frequencies), `SYS
 |---|---|---|---|---|---|
 | `K08161.0.FITS` | member of [`ftp.mpifr-bonn.mpg.de/vlbiarchive/DiFX_testdata/k08161/k08161.difx-1.5.0.outputfiles.tar.gz`](https://ftp.mpifr-bonn.mpg.de/vlbiarchive/DiFX_testdata/k08161/k08161.difx-1.5.0.outputfiles.tar.gz) (tarball 1 370 554 B) | 216 000 / `8628431e8fd0a94e006818bee3d29b294957ff15` | none (extracted from the tarball) | 216 000 / `8628431e8fd0a94e006818bee3d29b294957ff15` | `FITS-IDI single-polarization aux tables (NO_POL=1)`; also the "DiFX file with no `CORRVERS` card" branch |
 | `emerlin_multiuv.IDI1` | [`casatestdata/raw/fits/emerlin_multiuv.IDI1`](https://open-bitbucket.nrao.edu/projects/CASA/repos/casatestdata/raw/fits/emerlin_multiuv.IDI1) | 2 128 320 / `811e6008d39087a58f9b238b3072b54fcc57b7bd` | none | 2 128 320 / `811e6008d39087a58f9b238b3072b54fcc57b7bd` | `duplicated table names (e-MERLIN)` — the file holds **two** `UV_DATA` HDUs of 63 rows each |
+| `V389B.0.excerpt.FITS` | [Pawsey Data Portal](https://data.pawsey.org.au/) (Mediaflux) LBA archive, asset **4616273**, `/VLBI/Archive/LBA/v389/v389b/V389B.0.FITS` — anonymous, but by session key and asset id rather than a plain URL (both calls are in `scripts/MAKE.sh`) | 551 603 520 / `1b27ea9ca0dcff3ace9991443616a2200a9e2255` | excerpt, 209 of 33 408 `UV_DATA` rows | 5 014 080 / `35e97982c1e362ca211c246f10af20b1bad8aecf` | `FITS-IDI LBA file, no PHASE-CAL table (V389B)` — `CORRVERS = DiFX-1.5.4`, `SIDEBAND = [+1, −1]`, and **no `PHASE-CAL` table at all** |
 | `05BBA01_VENUS22.LTA_LL.1FITS.excerpt.fits` | [Zenodo 4529203](https://zenodo.org/records/4529203/files/05BBA01_VENUS22.LTA_LL.1FITS.fits?download=1) | 532 054 080 / `4f147ad15b3ed917a56a430748c371258eeb546b` | excerpt, 19 112 of 339 300 groups | 30 000 960 / `cbba34afa74bd8d8318a0252f720fe7f7d5509ea` | `UVFITS FQ sign conventions (real files)` — `CH WIDTH = -125 000` with `SIDEBAND = +1`, the AIPS encoding of a descending axis |
 | `05BBA01_VENUS22.LTB_LL.1FITS.excerpt.fits` | [Zenodo 4529203](https://zenodo.org/records/4529203/files/05BBA01_VENUS22.LTB_LL.1FITS.fits?download=1) | 532 054 080 / `96b4e1f0ce90708df66e18b12e9534bb14e2a627` | excerpt, 19 112 of 339 300 groups | 30 000 960 / `c2299f8eaa4b4674b7cb5925ab4428fa1ee80ede` | same testitem: the ascending twin of the same observation, the control |
 | `mirsplit.excerpt.UVFITS` | [`casatestdata/raw/uvfits/mirsplit.UVFITS`](https://open-bitbucket.nrao.edu/projects/CASA/repos/casatestdata/raw/uvfits/mirsplit.UVFITS) | 135 463 680 / `49e03a8fc019d4a659fadd65d737fca8e148e3c2` | excerpt, 3 983 of 18 000 groups | 30 000 960 / `11d538fa7f66d588d83cf75c13c96860906508bf` | same testitem: 16 IFs with `CH WIDTH < 0` **and** `SIDEBAND = -1`, so the rule must be OR, not XOR |
@@ -174,14 +187,23 @@ All data here are public. Please respect the source archives' own acknowledgment
 when publishing anything derived from them — this repository is a test corpus, not a
 re-publication of anyone's science.
 
-* **NRAO / VLBA** — `vlba-difx/` (MOJAVE BL178AC and BL178AL). VLBA correlator products
-  become public under the [NRAO data policy](https://science.nrao.edu/observing/proposal-types/data-management)
-  after the proprietary period; both are served as `data_rights = PUBLIC` by the NRAO
-  archive. They are not plain URLs: use <https://data.nrao.edu/portal/> and the product
+* **NRAO / VLBA** — `vlba-difx/` (MOJAVE BL178AC and BL178AL, and BK255AQ). VLBA correlator
+  products become public under the [NRAO data policy](https://science.nrao.edu/observing/proposal-types/data-management)
+  after the proprietary period; the two BL178 files are served as `data_rights = PUBLIC` by the
+  NRAO archive. They are not plain URLs: use <https://data.nrao.edu/portal/> and the product
   locators and original file names given above (anonymous staging request → `dl-dsoc.nrao.edu`
-  download links plus a `SHA1SUMS` at the request root). The National Radio Astronomy
-  Observatory is a facility of the National Science Foundation operated under cooperative
-  agreement by Associated Universities, Inc.
+  download links plus a `SHA1SUMS` at the request root). **BK255AQ is this repository owner's
+  own VLBA observation** (observed 2026-01-09, correlated 2026-01-27) and is published here by
+  the project owner; it is still within its proprietary period, so the archive has no public
+  product for it and the excerpt above is the only copy on the open web. The National Radio
+  Astronomy Observatory is a facility of the National Science Foundation operated under
+  cooperative agreement by Associated Universities, Inc.
+* **Pawsey Supercomputing Research Centre / LBA** — `misc/V389B.0.excerpt.FITS`, from the
+  Australian Long Baseline Array archive in the Pawsey Data Portal
+  (<https://data.pawsey.org.au/>, a Mediaflux store open to an anonymous `public` logon). The
+  LBA is operated by CSIRO's Australia Telescope National Facility with its university
+  partners; please credit the ATNF/LBA and the Pawsey archive as the source of this
+  observation (experiment V389B, 2011-08-12).
 * **astrogeo.org** — `astrogeo/` (leotest/r1482, rk01ak, bw089, bd152ie, raes03v, rdv87).
   Leonid Petrov's open archive of raw correlator output, plain HTTP, no login. Please credit
   the archive (<http://astrogeo.org/>) as the source of these observations.
@@ -240,10 +262,10 @@ python3 scripts/verify_excerpt.py FULL EXCERPT   # re-prove one excerpt against 
 SRC=/some/scratch/dir sh scripts/MAKE.sh         # re-download the sources and rebuild all excerpts
 ```
 
-`MAKE.sh` needs python ≥ 3.11 with astropy and numpy, plus curl and ~17 GB of scratch space
-for the source files it downloads; the two NRAO files must be staged by hand (it skips them
-when they are not in `$SRC`). Rebuilt excerpts are bit-identical to the ones committed here —
-that is what `SHA1SUMS` is for.
+`MAKE.sh` needs python ≥ 3.11 with astropy and numpy, plus curl and ~18 GB of scratch space
+for the source files it downloads; the three `vlba-difx/` originals must be staged by hand (it
+skips each one with a message when it is not in `$SRC`). Rebuilt excerpts are bit-identical to
+the ones committed here — that is what `SHA1SUMS` is for.
 
 `MANIFEST.md` carries the per-file detail: what each file's header actually contains and which
 reader behaviour it pins down.
