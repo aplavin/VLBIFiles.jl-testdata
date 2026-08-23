@@ -236,5 +236,17 @@ done
 #   misc/sma_masses/Per35.SWARM.1.3mm.s1.{lsb,usb}.1.151006.uvfits,
 #   vsop/v050c.fits.1-8, jive/n09q2_1_1-shortened.IDI1, jive/ep075f_WSRT.IDI1
 
+# --- Obit MeerKAT FITS-IDI: unresolved UV_DATA.SOURCE=0, 189 MB ---
+# No public locator is known; stage the project owner's original under this name. Five
+# deterministic UV rows are enough because every auxiliary HDU is retained byte for byte.
+GOALS="$SRC/GOALS_GroupS2_Ref59_Cals_Avg.idi"
+if [ -f "$GOALS" ]; then
+    $TRIM_IDI "$GOALS" "$ROOT/pkg-data/GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi" \
+        --keep '*%40000' --blocks 0 --no-sparse
+    $VERIFY "$GOALS" "$ROOT/pkg-data/GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi"
+else
+    echo "skip GOALS MeerKAT excerpt: stage $GOALS"
+fi
+
 echo
 echo "all excerpts regenerated; compare against SHA1SUMS with:  sha1sum -c ../SHA1SUMS"

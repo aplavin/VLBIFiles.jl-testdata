@@ -30,8 +30,8 @@ Testitems whose files are absent (no checkout and no network) skip themselves wi
 
 ## The verbatim-subset excerpt
 
-Eleven files were too large to publish whole (up to 46.9 GB), so this repository carries an
-**excerpt**: a copy of the published file in which the visibility container holds only a
+Twelve files were too large to publish whole (up to 46.9 GB), so this repository carries an
+**excerpt**: a copy of the source file in which the visibility container holds only a
 subset of the records — each record copied **byte for byte**, in the original order — and in
 which exactly **one header card** was rewritten, the record count of that container
 (FITS-IDI `NAXIS2`, UVFITS `GCOUNT`). Nothing else changes: every other HDU (`FREQUENCY`,
@@ -155,10 +155,10 @@ table set — `PHASE-CAL` (`NO_TONES = 3`, non-monotonic tone frequencies), `SYS
 
 ### `pkg-data/` — the package's own fixtures, moved out of `VLBIFiles.jl/test/data/`
 
-Twenty-two small files (34 652 890 B together) that VLBIFiles.jl has always tested against: the
-UVFITS/FITS-IDI readers, the image and difmap-model readers, the alist reader. They are
-unchanged — copied byte for byte out of the package repository, no excerpting, no rewriting —
-and the "source URL" column says what is *known* about each. Six were fetched on demand by the
+Twenty-four fixtures (129 816 730 B together) that VLBIFiles.jl tests against: the
+UVFITS/FITS-IDI readers, the image and difmap-model readers, the alist reader. The original
+twenty-three are unchanged copies; the GOALS file is the verbatim excerpt documented below. The
+"source URL" column says what is *known* about each. Six were fetched on demand by the
 test suite itself, so their URL is recorded in the code that fetched them; four more, the EHT
 M87 image, the J0743-5619 map and the J0433+0521 visibility/map pair, were downloaded from the
 CDS catalogue and from astrogeo.org; the rest predate any such record and say so.
@@ -168,6 +168,7 @@ CDS catalogue and from astrogeo.org; the rest predate any such record and say so
 | `vis.fits` | 2 131 200 / `9869f076976bdc1881f3b7174311b0994d2d2b19` | legacy VLBIFiles test fixture, original source not re-verified | VLBA 15 GHz, `BL149CZ` 2010-12-24, J1033+6051, AIPS UVFITS, 8 IFs × 1 channel × 4 Stokes, 5 082 groups — the main UVFITS fixture (`uvf simple`, `closures calculations`, the three `grouphdu …` items, `uvtable_wide`, `prefetch!`, …) |
 | `vis_multichan.vis` | 826 560 / `70c38e69b4ff67f098aeffdf4cc0c26922097c21` | legacy VLBIFiles test fixture, original source not re-verified | VLBA 4.6 GHz, `BH019` 1996-06-05, J0414+053A, 8 IFs × 16 channels, 515 groups — `uvf multichannel`, `frequency correctness CRPIX=1 multichan` |
 | `BL146_1.fits` | 2 448 000 / `f4ab6eea1ece41483b3dc5ec247d69c342be633c` | [`fits.gsfc.nasa.gov/registry/fitsidi/BL146_1.fits`](https://fits.gsfc.nasa.gov/registry/fitsidi/BL146_1.fits) (NASA GSFC FITS Support Office, FITS-IDI registry sample) | VLBA hardware correlator (`FXCORVER = 4.22`) 2007-08-23, 4 bands × 8 channels × 4 Stokes, 1 000 rows, full aux-table set — the FITS-IDI fixture of `FITS IDI small`, `FITS-IDI auxiliary tables`, `mmap column read`, `RDATE fallback…`, and the two-polarization control of `FITS-IDI single-polarization aux tables (NO_POL=1)` |
+| `GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi` | 95 112 000 / `9cecf285db4535de842e5bbd615a666abe02bc75` | legacy project fixture, original acquisition not recorded; full file 189 040 320 B / `9e9b82d02bdb7c7608ea7a2daa4b2ab4fe96dcd8` held by the project owner | Obit-written MeerKAT L-band polcal FITS-IDI; verbatim excerpt with 5 of 168 939 `UV_DATA` rows and every auxiliary HDU unchanged — `fitsidi Obit MeerKAT (non-standard axes/antennas)`, including unresolved `UV_DATA.SOURCE = 0` |
 | `DDTSUVDATA.fits` | 596 160 / `12e46c6deefa634b96065ed461e93d9d4eb1392c` | [`fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits`](https://fits.gsfc.nasa.gov/samples/DDTSUVDATA.fits) | VLA 3C161, 1984-01-29, written by AIPS; `NAXIS = 6`, i.e. **no IF axis**, 28 antennas, 7 956 groups — `uvf NAXIS=6 no IF axis (DDTSUVDATA)` |
 | `0332-391.uvfits` | 14 670 720 / `7e4e2a73864816ee1a21adfa0ba850e04df49da0` | [`purify/data/atca/0332-391.uvfits`](https://github.com/astro-informatics/purify/raw/development/data/atca/0332-391.uvfits) | ATCA 1.43 GHz 2001-05-20, Miriad `atlod`/`fits`; `NAXIS = 6`, descending `CDELT4` with no FQ table, Stokes I/Q/U/V, 13 channels — `uvf NAXIS=6 no IF axis (ATCA)` |
 | `mwa_1061316296.uvfits` | 1 529 280 / `947eb742ae446f7414e43b9bc30d9365965639aa` | [`rasg-datasets v0.0.4 …/MWA/1061316296.uvfits`](https://github.com/RadioAstronomySoftwareGroup/rasg-datasets/raw/v0.0.4/visibility_data/MWA/1061316296.uvfits) (renamed) | MWA 167 MHz 2013-08-23, written by pyuvdata; linear feeds, every visibility flagged — `uvf linear polarization (MWA)` |
@@ -189,10 +190,10 @@ CDS catalogue and from astrogeo.org; the rest predate any such record and say so
 | `difmap_model_clean.mod` | 24 964 / `80163e3eea24b0dc4489465bf81178d0b64566e4` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file, 631 delta components — `difmap model` |
 | `difmap_model_empty.mod` | 60 / `463d1702e22794fc0b1b68b86a6dd8e3cd6b5218` | legacy VLBIFiles test fixture, original source not re-verified | difmap model file with a phase-centre line and no components — `difmap model`, `generic loading` |
 
-One further fixture is referenced by the test suite under `pkg-data/` but is **not** published
-here: `GOALS_GroupS2_Ref59_Cals_Avg.idi`, the Obit-written MeerKAT FITS-IDI, has no located
-public source at all. Its testitem skips itself unless the file is dropped into `pkg-data/` by
-hand, exactly as it did while the package still had a `test/data/`.
+`GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi` has no located public source; the full original is
+held by the project owner. The standard FITS-IDI excerpt procedure keeps five deterministic
+visibility rows and all 95.1 MB of auxiliary HDUs byte-identical, with only `UV_DATA.NAXIS2`
+rewritten from 168 939 to 5. `verify_excerpt.py` reports `VERDICT: verbatim subset`.
 
 The two-CC-table case used to be served by `J0840-5732_X_2010_03_11_dew_map.fits`, which is
 public — <https://astrogeo.org/images/J0840-5732/J0840-5732_X_2010_03_11_dew_map.fits>, SHA1

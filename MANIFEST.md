@@ -1,6 +1,6 @@
 # MANIFEST — VLBIFiles.jl test data
 
-Every file here is either **a byte-identical copy of a published file**, **a verbatim subset
+Every file here is either **a byte-identical copy of a real source file**, **a verbatim subset
 of one**, or one of the two compact CLEAN-model FITS fixtures described below. A verbatim subset
 shortens only the visibility container (a subset of records, each copied byte for byte, in the
 original order) and rewrites exactly one header card — FITS-IDI `NAXIS2` or UVFITS `GCOUNT` — to
@@ -8,9 +8,8 @@ the new record count; a DiFX SWIN file has no header at all, so its verbatim sub
 prefix of the published file ending at a record boundary, with nothing rewritten. A compact
 CLEAN-model fixture has a new empty primary HDU and an unchanged original `AIPS CC` table HDU.
 No table value is recomputed, rescaled, averaged, reordered or synthesised. The files in
-`pkg-data/` are byte-identical copies too, but of the fixtures that lived in
-`VLBIFiles.jl/test/data/` rather than of an archive URL — see that section for what is and is
-not known about where each came from.
+`pkg-data/` are the fixtures that lived in `VLBIFiles.jl/test/data/`, or verbatim excerpts of
+those fixtures — see that section for what is and is not known about where each came from.
 
 The cutting tools and the checker live in `scripts/`:
 
@@ -22,7 +21,7 @@ The cutting tools and the checker live in `scripts/`:
 | `verify_excerpt.py` | re-proves the guarantee: hashes everything outside the trimmed segment of the full file and of the excerpt and diffs the trimmed HDU's header card by card |
 | `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` and the six `difx/` text files from their tarballs and checks them against `SHA1SUMS`, and cuts the two `difx/` SWIN excerpts with `trim_difx_swin.py`, checking each with `cmp` as a prefix of its source |
 
-`verify_excerpt.py` was run on all eleven FITS excerpts below; all eleven report
+`verify_excerpt.py` was run on all twelve FITS excerpts below; all twelve report
 **`VERDICT: verbatim subset`** with exactly one differing card. The two DiFX SWIN excerpts are
 byte prefixes of their sources (`head -c <size> FULL | cmp - EXCERPT`).
 
@@ -413,8 +412,8 @@ here — and it is the counterexample to any "descending `PC_FREQ` means LSB" he
 
 ## `pkg-data/` — the fixtures VLBIFiles.jl used to carry in `test/data/`
 
-Nothing here was cut, rewritten or regenerated — but the twenty files did not all reach this
-repository the same way, and the difference is exactly the eight that have a source URL.
+The twenty original fixtures were not cut, rewritten or regenerated, but they did not all reach
+this repository the same way; the difference is exactly the eight that have a source URL.
 **Twelve were copied byte for byte** out of the package repository when the package stopped
 carrying data of its own. **Six were never in it**: the old test suite downloaded them on demand
 at run time, so what was copied out was the URL in the code that fetched them, and the file here
@@ -435,6 +434,7 @@ images, three are difmap model files and one is a fourfit `alist` summary.
 |---|---|---|---|
 | `0332-391.uvfits` | 14 670 720 | `7e4e2a73864816ee1a21adfa0ba850e04df49da0` | none |
 | `BL146_1.fits` | 2 448 000 | `f4ab6eea1ece41483b3dc5ec247d69c342be633c` | none |
+| `GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi` | 95 112 000 | `9cecf285db4535de842e5bbd615a666abe02bc75` | verbatim subset of `UV_DATA` rows, 5 of 168 939; all other HDUs byte-identical; one card (`NAXIS2`) rewritten |
 | `DDTSUVDATA.fits` | 596 160 | `12e46c6deefa634b96065ed461e93d9d4eb1392c` | none |
 | `J0743-5619_S_2011_08_13_dew_map.fits` | 1 082 880 | `c26ea431800fda2e5ca91cdef73767e53d14f7c1` | none |
 | `J1256-0547_X_2020_10_18_pet_vis.fits` | 236 160 | `daa9bd688580ab5016caa2708ae57d24b8ca9fed` | none |
@@ -453,6 +453,17 @@ images, three are difmap model files and one is a fourfit `alist` summary.
 | `sampling_mean.fits` | 529 920 | `2689580af4d20ca33b98ac40afb2616423c6e920` | none |
 | `vis.fits` | 2 131 200 | `9869f076976bdc1881f3b7174311b0994d2d2b19` | none |
 | `vis_multichan.vis` | 826 560 | `70c38e69b4ff67f098aeffdf4cc0c26922097c21` | none |
+
+**`GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi`** — full original 189 040 320 B, SHA1
+`9e9b82d02bdb7c7608ea7a2daa4b2ab4fe96dcd8`. This Obit-written MeerKAT L-band polarization-
+calibration FITS-IDI is a legacy project fixture whose original acquisition was not recorded;
+the full file is held by the project owner and no public locator is known. Every one of its
+168 939 `UV_DATA.SOURCE` values is zero while the `SOURCE` catalogue is keyed 1…25. It also has
+the non-standard axes and antenna numbering pinned by `fitsidi Obit MeerKAT
+(non-standard axes/antennas)`. The excerpt keeps rows 1, 40001, 80001, 120001 and 160001
+verbatim (`--keep '*%40000' --blocks 0 --no-sparse`) and preserves every auxiliary HDU byte for
+byte; those HDUs set the 95.1 MB size floor. `verify_excerpt.py` reports only the expected
+`UV_DATA.NAXIS2` change, 168 939 → 5, and `VERDICT: verbatim subset`.
 
 ### Sources and what each file is for
 
@@ -691,10 +702,10 @@ correlation used — and the `DiFX SWIN …` testitems, the binary record reader
 | `jive/` | 2 | 79 496 640 |
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 9 | 199 791 360 |
-| `pkg-data/` | 23 | 34 704 730 |
+| `pkg-data/` | 24 | 129 816 730 |
 | `difx/` | 8 | 2 574 861 |
-| `scripts/` | 5 | 51 696 |
-| **total (data + scripts)** | **56 + 5** | **570 076 567 B ≈ 570.1 MB** |
+| `scripts/` | 5 | 52 883 |
+| **total (data + scripts)** | **57 + 5** | **665 189 754 B ≈ 665.2 MB** |
 
-Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
-above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.
+Largest single file: `pkg-data/GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi`, 95.1 MB. It remains
+below GitHub's 100 MiB hard limit; every other file is ≤ 78 MB.

@@ -30,6 +30,7 @@ a1fc17cfc91a0b075b54f09174088a4a24c9a684  misc/sma_masses/SVS13C.sub.SWARM.lsb.s
 7e4e2a73864816ee1a21adfa0ba850e04df49da0  pkg-data/0332-391.uvfits
 77226072ae5dba628e2e855f68c130f2356c69f8  pkg-data/alist_v6.fsumm
 f4ab6eea1ece41483b3dc5ec247d69c342be633c  pkg-data/BL146_1.fits
+9cecf285db4535de842e5bbd615a666abe02bc75  pkg-data/GOALS_GroupS2_Ref59_Cals_Avg.excerpt.idi
 c1ae1e63c2c297a9442a9eb57d28fee0c8e9694c  pkg-data/datafile_01-01_230GHz.uvfits
 12e46c6deefa634b96065ed461e93d9d4eb1392c  pkg-data/DDTSUVDATA.fits
 80163e3eea24b0dc4489465bf81178d0b64566e4  pkg-data/difmap_model_clean.mod
@@ -50,7 +51,7 @@ f46d3db9879c32da29afd3cd1f2c472f392dc8c9  pkg-data/M87_EHT_2018_3644_b3.fits
 98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5  pkg-data/SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits
 9869f076976bdc1881f3b7174311b0994d2d2b19  pkg-data/vis.fits
 70c38e69b4ff67f098aeffdf4cc0c26922097c21  pkg-data/vis_multichan.vis
-74bdcd65608f8493a2f16f9f87a13b85abe54b5c  scripts/MAKE.sh
+b1dd31ae95171dd68dd248853639ba39b5695625  scripts/MAKE.sh
 430b4efc2150d49b029fca632e04e3cc4a429f73  scripts/trim_difx_swin.py
 2e80b3447d06e3f0095b2ec5e858fe6bc9bee033  scripts/trim_idifits.py
 6c8a933e518632f123fd501cea990f943cc3e4bd  scripts/trim_uvfits_groups.py
