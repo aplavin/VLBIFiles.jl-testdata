@@ -3,10 +3,12 @@
 Real VLBI data files for the test suite of [VLBIFiles.jl](https://github.com/JuliaAPlavin/VLBIFiles.jl).
 
 Every file here is a **real observation** — or, for the correlator products, real correlator
-output of a real observation. **Nothing in this repository is synthetic**: no file was
-generated, simulated, hand-edited or "constructed to trigger" anything. They are published
-files from public archives, downloaded and (where too large) shortened by the
-strictly-verbatim procedure described below. The repository exists for one reason: so that
+output of a real observation. **Nothing in this repository has synthetic scientific content**:
+no observation or model value was generated, simulated, hand-edited or "constructed to trigger"
+anything. They are published files from public archives, downloaded and (where too large) shortened by the
+strictly-verbatim procedure described below. The two compact `mojave/` CLEAN-model fixtures
+instead contain unchanged original `AIPS CC` table HDUs in a new empty-primary FITS wrapper.
+The repository exists for one reason: so that
 VLBIFiles.jl can test its readers against the real formats real correlators write —
 lower-sideband conventions, single-polarization auxiliary tables, duplicated table names,
 zero-based axes, negative bandwidths — instead of against fixtures written by the same
@@ -47,6 +49,19 @@ Sizes are bytes. "orig SHA1" is the SHA1 of the published file the copy was made
 "staged SHA1" is the SHA1 of the file in this repository (identical to it when the file was
 copied whole). All staged SHA1s are also in `SHA1SUMS`, which covers every data file and
 every script in the repository — `sha1sum -c SHA1SUMS` checks the lot.
+
+### `mojave/` — MOJAVE archive products
+
+| file | source URL | orig size / SHA256 | done | staged size / SHA1 | used by |
+|---|---|---|---|---|---|
+| `0113-118.u.2026_01_09.uvf` | [`2cmVLBA/data/0113-118/2026_01_09/0113-118.u.2026_01_09.uvf`](https://www.cv.nrao.edu/2cmVLBA/data/0113-118/2026_01_09/0113-118.u.2026_01_09.uvf) | 1 296 000 / `9e7871be063f9d35cf5c4b52daf6bb937bdd4c1aae1922ea9ea4aaa85804bc74` | none | 1 296 000 / `0bb0dfa2d6048dc32aa359f3de71281747c2ee34` | MOJAVE UVFITS anchor |
+| `0113-118.u.2026_01_09.aips-cc.fits` | [`2cmVLBA/data/0113-118/2026_01_09/0113-118.u.2026_01_09.icn.fits.gz`](https://www.cv.nrao.edu/2cmVLBA/data/0113-118/2026_01_09/0113-118.u.2026_01_09.icn.fits.gz) | 15 561 568 / `50b8be973d212e41bddad203c65768e02cc2962002f2f08db5545351ece7fa17` | original `AIPS CC` HDU in an empty-primary FITS wrapper | 31 680 / `5d7af8abfb324296494f479af5a99a0010b62983` | 876-component CLEAN model |
+| `0316+413.u.2011_12_12.aips-cc.fits` | [`2cmVLBA/data/0316+413/2011_12_12/0316+413.u.2011_12_12.icn.fits.gz`](https://www.cv.nrao.edu/2cmVLBA/data/0316+413/2011_12_12/0316+413.u.2011_12_12.icn.fits.gz) | 3 907 357 / `48c20ccc1ba594d54a3af3a54fd322ce96833814c9547e39ad9f6fe211b20360` | original `AIPS CC` HDU in an empty-primary FITS wrapper | 34 560 / `63e54851c32af22ed2513ad829d2838fa201faea` | 984-component CLEAN model |
+
+The UVFITS file is an unchanged whole-file copy from the public MOJAVE archive; its SHA256
+was verified against a fresh download from the listed URL. Each compact model has a new empty
+primary HDU and an unchanged original `AIPS CC` table HDU. See `MANIFEST.md` for the reproducible
+extraction and table-preservation evidence.
 
 ### `astrogeo/` — [astrogeo.org](http://astrogeo.org/), L. Petrov's open archive of raw correlator output
 

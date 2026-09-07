@@ -1,10 +1,12 @@
 # MANIFEST — VLBIFiles.jl test data
 
-Every file here is either **a byte-identical copy of a published file**, or **a verbatim subset
-of one**: a copy in which only the visibility container was shortened (a subset of records, each
-copied byte for byte, in the original order) and exactly one header card — FITS-IDI `NAXIS2` or
-UVFITS `GCOUNT` — was rewritten to the new record count. No value is ever recomputed, rescaled,
-averaged, reordered or synthesised, and no other HDU is altered in any way. The files in
+Every file here is either **a byte-identical copy of a published file**, **a verbatim subset
+of one**, or one of the two compact CLEAN-model FITS fixtures described below. A verbatim subset
+shortens only the visibility container (a subset of records, each copied byte for byte, in the
+original order) and rewrites exactly one header card — FITS-IDI `NAXIS2` or UVFITS `GCOUNT` — to
+the new record count. A compact CLEAN-model fixture has a new empty primary HDU and an unchanged
+original `AIPS CC` table HDU. No table value is recomputed, rescaled, averaged, reordered or
+synthesised. The files in
 `pkg-data/` are byte-identical copies too, but of the fixtures that lived in
 `VLBIFiles.jl/test/data/` rather than of an archive URL — see that section for what is and is
 not known about where each came from.
@@ -25,6 +27,51 @@ The two cutting tools and the checker live in `scripts/`:
 SHA1, staged SHA1 and the testitem that uses it, plus the provenance and acknowledgments.
 This manifest carries the detail underneath that table — what each file's header actually
 contains, and which reader behaviour it pins down.
+
+---
+
+## `mojave/` — public MOJAVE products
+
+| file | bytes | staged SHA1 | transformation |
+|---|---|---|---|
+| `0113-118.u.2026_01_09.uvf` | 1 296 000 | `0bb0dfa2d6048dc32aa359f3de71281747c2ee34` | none |
+| `0113-118.u.2026_01_09.aips-cc.fits` | 31 680 | `5d7af8abfb324296494f479af5a99a0010b62983` | original `AIPS CC` HDU copied with CFITSIO `fits_copy_hdu` into a new empty-primary FITS file |
+| `0316+413.u.2011_12_12.aips-cc.fits` | 34 560 | `63e54851c32af22ed2513ad829d2838fa201faea` | original `AIPS CC` HDU copied with CFITSIO `fits_copy_hdu` into a new empty-primary FITS file |
+
+**`0113-118.u.2026_01_09.uvf`** —
+<https://www.cv.nrao.edu/2cmVLBA/data/0113-118/2026_01_09/0113-118.u.2026_01_09.uvf>,
+SHA256 `9e7871be063f9d35cf5c4b52daf6bb937bdd4c1aae1922ea9ea4aaa85804bc74`
+(1 296 000 B, unchanged). *Serves:* the MOJAVE UVFITS anchor.
+
+**`0113-118.u.2026_01_09.aips-cc.fits`** and
+**`0316+413.u.2011_12_12.aips-cc.fits`** — source maps
+<https://www.cv.nrao.edu/2cmVLBA/data/0113-118/2026_01_09/0113-118.u.2026_01_09.icn.fits.gz>
+and <https://www.cv.nrao.edu/2cmVLBA/data/0316+413/2011_12_12/0316+413.u.2011_12_12.icn.fits.gz>,
+whose whole-map SHA256 values are respectively
+`50b8be973d212e41bddad203c65768e02cc2962002f2f08db5545351ece7fa17` and
+`48c20ccc1ba594d54a3af3a54fd322ce96833814c9547e39ad9f6fe211b20360`.
+The reproducible extraction is: open the compressed source with FITSIO, move to its `AIPS CC`
+HDU, create a new FITS output, and call CFITSIO `fits_copy_hdu(input.fitsfile, output.fitsfile)`.
+With the VLBIFiles.jl environment active, this exact sequence writes one fixture:
+
+```julia
+using FITSIO
+
+source = ARGS[1]
+destination = ARGS[2]
+FITSIO.FITS(source, "r") do input
+    input[2]
+    FITSIO.FITS(destination, "w") do output
+        FITSIO.CFITSIO.fits_copy_hdu(input.fitsfile, output.fitsfile)
+    end
+end
+```
+
+The resulting files contain a standard empty primary HDU plus an exact source table HDU: the
+respective SHA256 values of that complete table HDU are
+`c3889ba89096521af56b5b043a200664aa40485b8ae949579971e13ab0cda30f` and
+`1a5b709e9d47b08585114be503ccf67f6023ee96280bcfd53341f18484511717`.
+They retain all 876 and 984 CLEAN components, respectively.
 
 ---
 
@@ -565,6 +612,7 @@ one, the empty case, and save/load round-trips through `tempname()`.
 
 | directory | files | bytes |
 |---|---|---|
+| `mojave/` | 3 | 1 362 240 |
 | `astrogeo/` | 7 | 113 808 960 |
 | `vlba-difx/` | 3 | 136 586 880 |
 | `jive/` | 2 | 79 496 640 |
@@ -572,7 +620,7 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `misc/` | 9 | 199 791 360 |
 | `pkg-data/` | 20 | 30 358 810 |
 | `scripts/` | 4 | 46 196 |
-| **total (data + scripts)** | **42 + 4** | **561 788 046 B ≈ 561.8 MB** |
+| **total (data + scripts)** | **45 + 4** | **563 150 286 B ≈ 563.2 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.
