@@ -149,13 +149,13 @@ table set — `PHASE-CAL` (`NO_TONES = 3`, non-monotonic tone frequencies), `SYS
 
 ### `pkg-data/` — the package's own fixtures, moved out of `VLBIFiles.jl/test/data/`
 
-Twenty small files (30 358 810 B together) that VLBIFiles.jl has always tested against: the
+Twenty-two small files (34 652 890 B together) that VLBIFiles.jl has always tested against: the
 UVFITS/FITS-IDI readers, the image and difmap-model readers, the alist reader. They are
 unchanged — copied byte for byte out of the package repository, no excerpting, no rewriting —
 and the "source URL" column says what is *known* about each. Six were fetched on demand by the
-test suite itself, so their URL is recorded in the code that fetched them; two more, the EHT
-M87 image and the J0743-5619 map, were downloaded from the CDS catalogue and from astrogeo.org
-respectively; the rest predate any such record and say so.
+test suite itself, so their URL is recorded in the code that fetched them; four more, the EHT
+M87 image, the J0743-5619 map and the J0433+0521 visibility/map pair, were downloaded from the
+CDS catalogue and from astrogeo.org; the rest predate any such record and say so.
 
 | file | bytes / SHA1 | source | what it is / used by |
 |---|---|---|---|
@@ -167,6 +167,8 @@ respectively; the rest predate any such record and say so.
 | `mwa_1061316296.uvfits` | 1 529 280 / `947eb742ae446f7414e43b9bc30d9365965639aa` | [`rasg-datasets v0.0.4 …/MWA/1061316296.uvfits`](https://github.com/RadioAstronomySoftwareGroup/rasg-datasets/raw/v0.0.4/visibility_data/MWA/1061316296.uvfits) (renamed) | MWA 167 MHz 2013-08-23, written by pyuvdata; linear feeds, every visibility flagged — `uvf linear polarization (MWA)` |
 | `paper_zen.uvfits` | 66 240 / `136e6beaf0c02e11b7bf3b4ad4a8eb4770e70158` | [`rasg-datasets v0.0.4 …/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits`](https://github.com/RadioAstronomySoftwareGroup/rasg-datasets/raw/v0.0.4/visibility_data/PAPER/zen.2456865.60537.xy.uvcRREAAM.uvfits) (renamed) | PAPER 100 MHz 2014-07-27, Miriad; `NAXIS = 6`, single `XY` product, 11 channels — `uvf NAXIS=6 linear pol (PAPER)`, `faithful warnings` |
 | `J1256-0547_X_2020_10_18_pet_vis.fits` | 236 160 / `daa9bd688580ab5016caa2708ae57d24b8ca9fed` | [`astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits`](https://astrogeo.org/images/J1256-0547/J1256-0547_X_2020_10_18_pet_vis.fits) | VLBA X-band 2020-10-18 (`uh007b`), merged by `UVA_MERGE 2.1`: **three `AIPS AN` tables**, i.e. three subarrays in one file — `uvf multi-array baselines` |
+| `J0433+0521_U_1996_07_10_moj_vis.fits` | 74 880 / `deea726f8c2296497ba87bed739fc33d30d18f3b` | [`astrogeo.org/images/J0433+0521/J0433+0521_U_1996_07_10_moj_vis.fits`](https://astrogeo.org/images/J0433+0521/J0433+0521_U_1996_07_10_moj_vis.fits), downloaded 2026-11-18 (astrogeo revises the header position from time to time, so a later download may differ in those cards) | VLBA 15 GHz 1996-07-10 (`BK037`, MOJAVE), `PROJECT = 'Mojave'`, written by AIPS `15OCT96`: single source, `LL`, 1 IF, 1 406 groups, phase centre in the `RA`/`DEC` axis `CRVAL` and **no `OBSRA`/`OBSDEC`** — `uvf header coordinates` |
+| `J0433+0521_U_1996_07_10_moj_map.fits` | 4 219 200 / `9af5ab35dd5b198d019d9b90b860070648c8b85e` | [`astrogeo.org/images/J0433+0521/J0433+0521_U_1996_07_10_moj_map.fits`](https://astrogeo.org/images/J0433+0521/J0433+0521_U_1996_07_10_moj_map.fits), downloaded 2026-11-18, as its visibility file | the difmap CLEAN image of that file: 1024², 0.1 mas pixels, `AIPS CC` table of 395 components, **no `OBSRA`/`OBSDEC`** — `uvf header coordinates` |
 | `SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits` | 1 238 400 / `98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5` | EHT 2017 April public data release, HOPS/`netcal` product; legacy VLBIFiles test fixture, original download not re-verified | EHT 229 GHz 2017-04-11, 3C279, Stokes I, 14 455 groups — `uvf EHT 2`, `antenna catalog` (real ECEF cross-check) |
 | `hops_3600_OJ287_LO+HI.medcal_dcal_full.uvfits` | 794 880 / `02bb180639a3dad2233be7d867a44ed9f2d4f57c` | EHT 2017 April HOPS product; legacy VLBIFiles test fixture, original download not re-verified | EHT 227 GHz 2017-04-09, OJ 287, LO+HI bands (2 IFs), 6 220 groups — `uvf EHT 1` |
 | `datafile_01-01_230GHz.uvfits` | 178 560 / `c1ae1e63c2c297a9442a9eb57d28fee0c8e9694c` | EHT 2013 campaign product; legacy VLBIFiles test fixture, original download not re-verified | EHT 230 GHz 2013-01-01, M87, 1 772 groups — `uvf EHT 3` |
@@ -251,7 +253,8 @@ re-publication of anyone's science.
   it is: **NASA GSFC FITS Support Office** sample files (`BL146_1.fits` from the FITS-IDI
   registry, `DDTSUVDATA.fits` from the samples directory, <https://fits.gsfc.nasa.gov/>);
   **astrogeo.org** (`J1256-0547_X_2020_10_18_pet_vis.fits`,
-  `J0743-5619_S_2011_08_13_dew_map.fits`, credit the archive as above);
+  `J0743-5619_S_2011_08_13_dew_map.fits`, `J0433+0521_U_1996_07_10_moj_vis.fits`,
+  `J0433+0521_U_1996_07_10_moj_map.fits`, credit the archive as above);
   the **purify** project's ATCA example (`0332-391.uvfits`,
   <https://github.com/astro-informatics/purify>, observed by the ATCA, an Australia Telescope
   National Facility instrument); and the **Radio Astronomy Software Group**'s `rasg-datasets`
