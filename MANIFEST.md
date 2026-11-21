@@ -4,24 +4,27 @@ Every file here is either **a byte-identical copy of a published file**, **a ver
 of one**, or one of the two compact CLEAN-model FITS fixtures described below. A verbatim subset
 shortens only the visibility container (a subset of records, each copied byte for byte, in the
 original order) and rewrites exactly one header card — FITS-IDI `NAXIS2` or UVFITS `GCOUNT` — to
-the new record count. A compact CLEAN-model fixture has a new empty primary HDU and an unchanged
-original `AIPS CC` table HDU. No table value is recomputed, rescaled, averaged, reordered or
-synthesised. The files in
+the new record count; a DiFX SWIN file has no header at all, so its verbatim subset is a byte
+prefix of the published file ending at a record boundary, with nothing rewritten. A compact
+CLEAN-model fixture has a new empty primary HDU and an unchanged original `AIPS CC` table HDU.
+No table value is recomputed, rescaled, averaged, reordered or synthesised. The files in
 `pkg-data/` are byte-identical copies too, but of the fixtures that lived in
 `VLBIFiles.jl/test/data/` rather than of an archive URL — see that section for what is and is
 not known about where each came from.
 
-The two cutting tools and the checker live in `scripts/`:
+The cutting tools and the checker live in `scripts/`:
 
 | script | what it does |
 |---|---|
 | `trim_idifits.py` | FITS-IDI: keeps a subset of `UV_DATA` rows, rewrites `NAXIS2`, copies every other HDU as raw bytes |
 | `trim_uvfits_groups.py` | UVFITS random groups: keeps a subset of groups, rewrites `GCOUNT`, copies every table extension as raw bytes (they move up in the file because the tables *follow* the data) |
+| `trim_difx_swin.py` | DiFX SWIN: keeps the records of the first N integrations, a byte prefix of the file cut at a record boundary (record lengths from the job's `.input`); checks every record header and that the records tile the file |
 | `verify_excerpt.py` | re-proves the guarantee: hashes everything outside the trimmed segment of the full file and of the excerpt and diffs the trimmed HDU's header card by card |
-| `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` and the six `difx/` files from their tarballs and checks them against `SHA1SUMS` |
+| `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` and the six `difx/` text files from their tarballs and checks them against `SHA1SUMS`, and cuts the two `difx/` SWIN excerpts with `trim_difx_swin.py`, checking each with `cmp` as a prefix of its source |
 
-`verify_excerpt.py` was run on all eleven excerpts below; all eleven report
-**`VERDICT: verbatim subset`** with exactly one differing card.
+`verify_excerpt.py` was run on all eleven FITS excerpts below; all eleven report
+**`VERDICT: verbatim subset`** with exactly one differing card. The two DiFX SWIN excerpts are
+byte prefixes of their sources (`head -c <size> FULL | cmp - EXCERPT`).
 
 `README.md` is the front page: it lists every file with its source URL, original size and
 SHA1, staged SHA1 and the testitem that uses it, plus the provenance and acknowledgments.
@@ -618,6 +621,8 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `e21f19-1-b2_1014.input` | 230 143 | `02c945f88409d0bbdf738ec3c82814bbfc9bc1a0` | none (tarball member) |
 | `e21f19-1-b2_1014.calc` | 2 659 | `859ec3b5f7d991ee40a9e014ddfa981f9441eda6` | none (tarball member) |
 | `e21f19-1-b2_1014.im` | 32 058 | `8b942e908e116de2ea555a820e5bd2d71ae0994f` | none (tarball member) |
+| `e21f19-1-b4_1014.difx/DIFX_59323_012480.s0000.b0000` | 753 504 | `39315b01d5731f072c286ffa73c9c8aa20608df9` | the first 753 504 of 226 051 200 bytes (SHA1 `58e1121e754a3c380f013f98e8cb1fbfbc052664`): records 1–752 of 225 600 |
+| `e21f19-1-b2_1014.difx/DIFX_59323_012480.s0000.b0000` | 1 466 928 | `ec8c76528f1bd8f417c11c87e467de2613e2a228` | the first 1 466 928 of 439 865 976 bytes (SHA1 `fbc88fc8d36f369a68abd05cf707539ab18905d3`): records 1–1 464 of 438 988 |
 
 The DiFX correlator job files (`.input`, `.calc`, `.im`) of one job of the Event
 Horizon Telescope 2021 April 345 GHz campaign, experiment `e21f19`, ALMA project
@@ -628,6 +633,8 @@ under <https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/>:
 |---|---|---|---|---|
 | `e21f19-1-b4_1014.*` | `group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar` | 481 280 | `8caa2984f0fdd9ab7496014de21e7a94` | `abbd7e6907d0331e725172ef5fa7ab116a8706f3` |
 | `e21f19-1-b2_1014.*` | `group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar` | 1 802 240 | `1c0f5c040aa5c9fbe019b9a980baf04c` | `2af0390a5defac64b468237267f1f1a91f1a39ce` |
+| `e21f19-1-b4_1014.difx/` | `group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-swin.tar` | 226 058 240 | `1fcad3207f74e6055de94566d5f2b2bd` | `ec2d2b84a856d49765a34bcbb5225f01f7d442ed` |
+| `e21f19-1-b2_1014.difx/` | `group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-swin.tar` | 439 869 440 | `9169954707483bb5bbac3b04c3c17288` | `9f4ad3628506ce72047842e39ac386d3990766c0` |
 
 The members are extracted with `tar -xOf` and are byte-identical to the tarball contents
 (`MAKE.sh` repeats the extraction and checks `SHA1SUMS`). Both groups are job 1014, scan
@@ -651,9 +658,26 @@ In both, the `.im` header says `ABERRATION CORR: MIXED` and the delay-model rows
 different number layout from the other antennas: the `.im` was produced by DiFX's
 `calcifMixed.py`, which merges a normal and a no-atmosphere `difxcalc` run and rewrites the
 DELAY/DRY/WET rows of ALMA.
+
+**`e21f19-1-<band>_1014.difx/DIFX_59323_012480.s0000.b0000`** — the SWIN visibility file of
+each job (the only file in its `.difx` directory, the only member of the "swin" tarball besides
+that directory), cut to its first two integrations, centred at 12480.2 s and 12480.6 s of MJD
+59323. A SWIN file is a plain sequence of records, each a 74-byte binary header (mpifxcorr
+`Visibility::writeDiFXHeader`: sync word `0xFF00FF00`, header version 1, baseline number, MJD,
+seconds, configuration, source and FREQ TABLE indices, polarization pair, pulsar bin, weight,
+u/v/w, little-endian and packed) and the record's `NUM CHANNELS ÷ CHANS TO AVG` complex float32
+samples — 116 here, so every record is 1 002 bytes. The records of one integration are
+contiguous and integrations follow in time order, so the first two integrations are a prefix of
+the file; `trim_difx_swin.py` checks both, and that no later record belongs to them.
+Band 4 (DiFX 2.6.2): 752 records, autocorrelations of AA (baseline 257, `XX XY YX YY`) and PV
+(514, `LL LR RL RR`) and the AA–PV cross-correlation (258, `XL XR YL YR`), FREQ TABLE entries
+35–66. Band 2 (DiFX 2.7.1): 1 464 records on baselines 257, 258, 259, 514, 515 and 771 (AA, NN,
+PV), FREQ TABLE entries 67–98 — the 2.7 output bands; 24 `(time, baseline, freq, pol)`
+combinations occur twice, with different weights (e.g. baseline 515, entry 76, `LL`: records
+498 and 509, weights 0.9222 and 0.0456), which the file holds as written.
 *Serves:* the `DiFX .input …` / `DiFX .calc and .im …` testitems — the strict sequential
 readers of all three text formats against real files of both DiFX versions the 2021 EHT
-correlation used.
+correlation used — and the `DiFX SWIN …` testitems, the binary record reader.
 
 ---
 
@@ -668,9 +692,9 @@ correlation used.
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 9 | 199 791 360 |
 | `pkg-data/` | 23 | 34 704 730 |
-| `difx/` | 6 | 354 429 |
-| `scripts/` | 4 | 46 982 |
-| **total (data + scripts)** | **54 + 4** | **567 851 421 B ≈ 567.9 MB** |
+| `difx/` | 8 | 2 574 861 |
+| `scripts/` | 5 | 51 696 |
+| **total (data + scripts)** | **56 + 5** | **570 076 567 B ≈ 570.1 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.

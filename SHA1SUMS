@@ -6,9 +6,11 @@ cd3b71ac93a0e0d8a9a3cb716ea077c9b8c67514  astrogeo/2008_05_04_bw089_04.fits
 9fb19c15c6f503ab7b57b865e54dbe0a73cd9877  astrogeo/leotest+1.5us.fits
 e26b6a0b74df1b2e9accbae0336f346824f5590f  astrogeo/VLBA_BD152IE_gatedie_BIN0_SRC0_0_121231T205433.excerpt.idifits
 859ec3b5f7d991ee40a9e014ddfa981f9441eda6  difx/e21f19-1-b2_1014.calc
+ec8c76528f1bd8f417c11c87e467de2613e2a228  difx/e21f19-1-b2_1014.difx/DIFX_59323_012480.s0000.b0000
 8b942e908e116de2ea555a820e5bd2d71ae0994f  difx/e21f19-1-b2_1014.im
 02c945f88409d0bbdf738ec3c82814bbfc9bc1a0  difx/e21f19-1-b2_1014.input
 338294d427d23e7c17a1b32b550d35a7a6e21eac  difx/e21f19-1-b4_1014.calc
+39315b01d5731f072c286ffa73c9c8aa20608df9  difx/e21f19-1-b4_1014.difx/DIFX_59323_012480.s0000.b0000
 cd0037d84a64191924b6f8064fae5361a32f31f3  difx/e21f19-1-b4_1014.im
 209cba7ea94c28189924690060cbc7e7087b5167  difx/e21f19-1-b4_1014.input
 8792ddd266d2bc25b94f9a49ee4cf71220a01d8a  jive/ep075f_WSRT.IDI1
@@ -48,7 +50,8 @@ f46d3db9879c32da29afd3cd1f2c472f392dc8c9  pkg-data/M87_EHT_2018_3644_b3.fits
 98c4fdcab7243b66ca02b8165ceebb0f6f8dd5d5  pkg-data/SR1_3C279_2017_101_hi_hops_netcal_StokesI.uvfits
 9869f076976bdc1881f3b7174311b0994d2d2b19  pkg-data/vis.fits
 70c38e69b4ff67f098aeffdf4cc0c26922097c21  pkg-data/vis_multichan.vis
-6eee51ed3478c8e58e11dda55daa493b64f2ab28  scripts/MAKE.sh
+74bdcd65608f8493a2f16f9f87a13b85abe54b5c  scripts/MAKE.sh
+430b4efc2150d49b029fca632e04e3cc4a429f73  scripts/trim_difx_swin.py
 2e80b3447d06e3f0095b2ec5e858fe6bc9bee033  scripts/trim_idifits.py
 6c8a933e518632f123fd501cea990f943cc3e4bd  scripts/trim_uvfits_groups.py
 55a5983d89cae0bf988082c46f962083296c5653  scripts/verify_excerpt.py

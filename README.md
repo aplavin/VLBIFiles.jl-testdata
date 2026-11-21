@@ -43,6 +43,12 @@ from the two files alone (`verify_excerpt.py FULL EXCERPT` → `VERDICT: verbati
 `MAKE.sh`, which regenerates every excerpt in this repository from its original source URL
 bit for bit.
 
+Two more files, the DiFX SWIN visibility files in `difx/`, are excerpts of a simpler kind:
+the format has no file header and no record count, only records one after another, so their
+excerpt is a **byte prefix** of the published file that ends at a record boundary — every byte
+is the original's and nothing at all is rewritten. `scripts/trim_difx_swin.py` cuts it, and
+`head -c <size> FULL | cmp - EXCERPT` re-proves it.
+
 ## Files
 
 Sizes are bytes. "orig SHA1" is the SHA1 of the published file the copy was made from;
@@ -200,7 +206,10 @@ needed by anything.
 
 The `.input`, `.calc` and `.im` text files of DiFX job 1014 of experiment `e21f19` (scan
 `109-0328` on J1512-0905, 2021-04-19) in two bands, extracted unchanged from tarballs of the
-ALMA archive (`MAKE.sh` repeats the extraction).
+ALMA archive (`MAKE.sh` repeats the extraction), and in `<job>.difx/` the leading records of
+the job's SWIN visibility file — exactly its first two 0.4 s integrations — cut from the "swin"
+tarball of the same archive by `scripts/trim_difx_swin.py`. The SWIN file and its directory keep
+their DiFX names (no `.excerpt` marker), since DiFX readers find them by those names.
 
 | file | source URL | orig size / SHA1 | done | staged size / SHA1 | used by |
 |---|---|---|---|---|---|
@@ -210,14 +219,16 @@ ALMA archive (`MAKE.sh` repeats the extraction).
 | `e21f19-1-b2_1014.input` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar) (tarball 1 802 240 B) | 230 143 / `02c945f88409d0bbdf738ec3c82814bbfc9bc1a0` | none (extracted from the tarball) | 230 143 / `02c945f88409d0bbdf738ec3c82814bbfc9bc1a0` | `DiFX .input, .calc and .im, DiFX 2.7.1 (e21f19-1-b2_1014)` |
 | `e21f19-1-b2_1014.calc` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar) (tarball 1 802 240 B) | 2 659 / `859ec3b5f7d991ee40a9e014ddfa981f9441eda6` | none (extracted from the tarball) | 2 659 / `859ec3b5f7d991ee40a9e014ddfa981f9441eda6` | `DiFX .input, .calc and .im, DiFX 2.7.1 (e21f19-1-b2_1014)` |
 | `e21f19-1-b2_1014.im` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar) (tarball 1 802 240 B) | 32 058 / `8b942e908e116de2ea555a820e5bd2d71ae0994f` | none (extracted from the tarball) | 32 058 / `8b942e908e116de2ea555a820e5bd2d71ae0994f` | `DiFX .input, .calc and .im, DiFX 2.7.1 (e21f19-1-b2_1014)` |
+| `e21f19-1-b4_1014.difx/DIFX_59323_012480.s0000.b0000` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-swin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-swin.tar) (tarball 226 058 240 B) | 226 051 200 / `58e1121e754a3c380f013f98e8cb1fbfbc052664` | excerpt, the first 752 of 225 600 records (the first two integrations, a byte prefix) | 753 504 / `39315b01d5731f072c286ffa73c9c8aa20608df9` | `DiFX SWIN, DiFX 2.6.2 (e21f19-1-b4_1014)` |
+| `e21f19-1-b2_1014.difx/DIFX_59323_012480.s0000.b0000` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-swin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-swin.tar) (tarball 439 869 440 B) | 439 865 976 / `fbc88fc8d36f369a68abd05cf707539ab18905d3` | excerpt, the first 1 464 of 438 988 records (the first two integrations, a byte prefix) | 1 466 928 / `ec8c76528f1bd8f417c11c87e467de2613e2a228` | `DiFX SWIN, DiFX 2.7.1 (e21f19-1-b2_1014)` |
 
 Band 4 was correlated with DiFX 2.6.2 (2 telescopes, 67 frequency-table entries), band 2 with
 DiFX 2.7.1 (3 telescopes, 163 entries, with the `GAIN OFFSET` / `TARGET FREQ` lines of the 2.7
 writer), so the pair covers both `.input` layouts of the 2021 correlation. The tarball MD5s, as
 the archive publishes them in its `md5sum.txt`, are in `MANIFEST.md`.
 
-`scripts/` (4 files) holds `trim_idifits.py`, `trim_uvfits_groups.py`, `verify_excerpt.py` and
-`MAKE.sh`; they are documentation and reproduction tools, not data.
+`scripts/` (5 files) holds `trim_idifits.py`, `trim_uvfits_groups.py`, `trim_difx_swin.py`,
+`verify_excerpt.py` and `MAKE.sh`; they are documentation and reproduction tools, not data.
 
 ## Provenance and acknowledgments
 
@@ -304,7 +315,7 @@ python3 scripts/verify_excerpt.py FULL EXCERPT   # re-prove one excerpt against 
 SRC=/some/scratch/dir sh scripts/MAKE.sh         # re-download the sources and rebuild all excerpts
 ```
 
-`MAKE.sh` needs python ≥ 3.11 with astropy and numpy, plus curl and ~18 GB of scratch space
+`MAKE.sh` needs python ≥ 3.11 with astropy and numpy, plus curl and ~19 GB of scratch space
 for the source files it downloads; the three `vlba-difx/` originals must be staged by hand (it
 skips each one with a message when it is not in `$SRC`). Rebuilt excerpts are bit-identical to
 the ones committed here — that is what `SHA1SUMS` is for.

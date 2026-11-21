@@ -10,7 +10,7 @@
 # UVFITS `GCOUNT`) is rewritten.  `verify_excerpt.py FULL EXCERPT` re-proves that property.
 #
 #   requirements: python3.11, astropy >= 6, numpy >= 1.24, curl
-#   usage:        SRC=/some/scratch/dir sh MAKE.sh          (needs ~18 GB of scratch)
+#   usage:        SRC=/some/scratch/dir sh MAKE.sh          (needs ~19 GB of scratch)
 #
 # The excerpts committed here were built with python 3.11.11, astropy 8.0.1 and numpy 2.2.5.
 # Four of the calls below rank source-blocks by amplitude (--blocks > 0) and probe them with
@@ -211,7 +211,25 @@ for band in b4 b2; do
         tar -xOf "$SRC/$tarball" "e21f19-1-${band}_1014.$ext" > "$ROOT/difx/e21f19-1-${band}_1014.$ext"
     done
 done
-(cd "$ROOT" && grep ' difx/' SHA1SUMS | sha1sum -c -)
+(cd "$ROOT" && grep ' difx/[^/]*$' SHA1SUMS | sha1sum -c -)
+
+# --- difx/<job>.difx/ : the first two integrations of the SWIN visibility file of the same jobs ---
+# A "swin" tarball of the ALMA archive (plain tar, 226 058 240 B and 439 869 440 B) holds the
+# job's .difx directory with its one SWIN file.  That file has no file header, so its excerpt
+# is a byte PREFIX of the member, cut by trim_difx_swin.py before the first record of the third
+# integration, with record lengths from the .input extracted above; nothing is rewritten.
+# `head -c | cmp` re-proves the prefix property.
+for band in b4 b2; do
+    job=e21f19-1-${band}_1014
+    member=$job.difx/DIFX_59323_012480.s0000.b0000
+    tarball=group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-$band-b7mar20-J1512-0905-swin.tar
+    get "https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/$tarball" "$tarball"
+    tar -xf "$SRC/$tarball" -C "$SRC" "$member"
+    mkdir -p "$ROOT/difx/$job.difx"
+    $PY "$HERE/trim_difx_swin.py" "$SRC/$member" "$ROOT/difx/$job.input" "$ROOT/difx/$member" --integrations 2
+    head -c "$(wc -c < "$ROOT/difx/$member")" "$SRC/$member" | cmp - "$ROOT/difx/$member"
+done
+(cd "$ROOT" && grep ' difx/.*\.difx/' SHA1SUMS | sha1sum -c -)
 
 # Files copied whole (no transformation, no command needed) — see README.md for every URL:
 #   misc/emerlin_multiuv.IDI1,
