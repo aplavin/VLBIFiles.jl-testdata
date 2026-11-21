@@ -618,9 +618,9 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `jive/` | 2 | 79 496 640 |
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 9 | 199 791 360 |
-| `pkg-data/` | 20 | 30 358 810 |
+| `pkg-data/` | 23 | 34 704 730 |
 | `scripts/` | 4 | 46 196 |
-| **total (data + scripts)** | **45 + 4** | **563 150 286 B ≈ 563.2 MB** |
+| **total (data + scripts)** | **48 + 4** | **567 496 206 B ≈ 567.5 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.
