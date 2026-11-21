@@ -196,6 +196,26 @@ public — <https://astrogeo.org/images/J0840-5732/J0840-5732_X_2010_03_11_dew_m
 pipeline at a hundredth of the size, so that testitem no longer skips and the J0840 map is not
 needed by anything.
 
+### `difx/` — DiFX correlator job files, EHT 2021 345 GHz, via the ALMA archive
+
+The `.input`, `.calc` and `.im` text files of DiFX job 1014 of experiment `e21f19` (scan
+`109-0328` on J1512-0905, 2021-04-19) in two bands, extracted unchanged from tarballs of the
+ALMA archive (`MAKE.sh` repeats the extraction).
+
+| file | source URL | orig size / SHA1 | done | staged size / SHA1 | used by |
+|---|---|---|---|---|---|
+| `e21f19-1-b4_1014.input` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar) (tarball 481 280 B) | 65 235 / `209cba7ea94c28189924690060cbc7e7087b5167` | none (extracted from the tarball) | 65 235 / `209cba7ea94c28189924690060cbc7e7087b5167` | `DiFX .input, DiFX 2.6.2 (e21f19-1-b4_1014)` |
+| `e21f19-1-b4_1014.calc` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar) (tarball 481 280 B) | 2 451 / `338294d427d23e7c17a1b32b550d35a7a6e21eac` | none (extracted from the tarball) | 2 451 / `338294d427d23e7c17a1b32b550d35a7a6e21eac` | `DiFX .calc and .im, DiFX 2.6.2 (e21f19-1-b4_1014)` |
+| `e21f19-1-b4_1014.im` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar) (tarball 481 280 B) | 21 883 / `cd0037d84a64191924b6f8064fae5361a32f31f3` | none (extracted from the tarball) | 21 883 / `cd0037d84a64191924b6f8064fae5361a32f31f3` | `DiFX .calc and .im, DiFX 2.6.2 (e21f19-1-b4_1014)` |
+| `e21f19-1-b2_1014.input` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar) (tarball 1 802 240 B) | 230 143 / `02c945f88409d0bbdf738ec3c82814bbfc9bc1a0` | none (extracted from the tarball) | 230 143 / `02c945f88409d0bbdf738ec3c82814bbfc9bc1a0` | `DiFX .input, .calc and .im, DiFX 2.7.1 (e21f19-1-b2_1014)` |
+| `e21f19-1-b2_1014.calc` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar) (tarball 1 802 240 B) | 2 659 / `859ec3b5f7d991ee40a9e014ddfa981f9441eda6` | none (extracted from the tarball) | 2 659 / `859ec3b5f7d991ee40a9e014ddfa981f9441eda6` | `DiFX .input, .calc and .im, DiFX 2.7.1 (e21f19-1-b2_1014)` |
+| `e21f19-1-b2_1014.im` | member of [`almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar`](https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar) (tarball 1 802 240 B) | 32 058 / `8b942e908e116de2ea555a820e5bd2d71ae0994f` | none (extracted from the tarball) | 32 058 / `8b942e908e116de2ea555a820e5bd2d71ae0994f` | `DiFX .input, .calc and .im, DiFX 2.7.1 (e21f19-1-b2_1014)` |
+
+Band 4 was correlated with DiFX 2.6.2 (2 telescopes, 67 frequency-table entries), band 2 with
+DiFX 2.7.1 (3 telescopes, 163 entries, with the `GAIN OFFSET` / `TARGET FREQ` lines of the 2.7
+writer), so the pair covers both `.input` layouts of the 2021 correlation. The tarball MD5s, as
+the archive publishes them in its `md5sum.txt`, are in `MANIFEST.md`.
+
 `scripts/` (4 files) holds `trim_idifits.py`, `trim_uvfits_groups.py`, `verify_excerpt.py` and
 `MAKE.sh`; they are documentation and reproduction tools, not data.
 
@@ -248,6 +268,8 @@ re-publication of anyone's science.
 * **DARTS / ISAS, JAXA** — `vsop/v050c.fits.1-8`, from the VSOP/HALCA correlated-data archive
   <https://data.darts.isas.jaxa.jp/pub/halca/VSOP_CorrelatedData/>. VSOP was led by ISAS with
   the VLBA correlation done at NRAO.
+* **ALMA science archive** — `difx/`, correlator job files of the Event Horizon Telescope 2021
+  345 GHz observations (ALMA project 2011.0.00013.E), from <https://almascience.eso.org/>.
 * **MPIfR** — `misc/K08161.0.FITS`, a member of the DiFX 1.5.0 test-data tarball on the MPIfR
   public VLBI archive <https://ftp.mpifr-bonn.mpg.de/vlbiarchive/DiFX_testdata/>.
 * **`pkg-data/`**, the fixtures moved out of the package repository. Where the source is known

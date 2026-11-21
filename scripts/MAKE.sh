@@ -191,13 +191,27 @@ $VERIFY "$SRC/SVS13C.sub.SWARM.lsb.s3.170127.uvfits" \
     "$ROOT/misc/sma_masses/SVS13C.sub.SWARM.lsb.s3.170127.excerpt.uvfits"
 
 # --- K08161.0.FITS : one member of the MPIfR DiFX 1.5.0 test-data tarball, 1 370 554 B ---
-# The one file here whose published bytes are not a download but a tarball member, so
-# extracting it is the whole procedure — no trimming, no rewriting.  The member is 216 000 B
-# and comes out byte for byte as committed, which the SHA1SUMS line below is the proof of.
+# Its published bytes are not a download but a tarball member, so extracting it is the whole
+# procedure — no trimming, no rewriting.  The member is 216 000 B and comes out byte for byte
+# as committed, which the SHA1SUMS line below is the proof of.
 get https://ftp.mpifr-bonn.mpg.de/vlbiarchive/DiFX_testdata/k08161/k08161.difx-1.5.0.outputfiles.tar.gz \
     k08161.difx-1.5.0.outputfiles.tar.gz
 tar -xzOf "$SRC/k08161.difx-1.5.0.outputfiles.tar.gz" K08161.0.FITS > "$ROOT/misc/K08161.0.FITS"
 (cd "$ROOT" && grep ' misc/K08161\.0\.FITS$' SHA1SUMS | sha1sum -c -)
+
+# --- difx/ : DiFX job text files of EHT 2021 (e21f19) job 1014, bands b4 and b2 ---
+# Members of two "dxin" tarballs of the ALMA archive (plain tar, 481 280 B and 1 802 240 B),
+# extracted as they are, like K08161 above: the .input, .calc and .im of job
+# e21f19-1-<band>_1014 (scan 109-0328 on J1512-0905).
+mkdir -p "$ROOT/difx"
+for band in b4 b2; do
+    tarball=group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-$band-b7mar20-J1512-0905-dxin.tar
+    get "https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/$tarball" "$tarball"
+    for ext in input calc im; do
+        tar -xOf "$SRC/$tarball" "e21f19-1-${band}_1014.$ext" > "$ROOT/difx/e21f19-1-${band}_1014.$ext"
+    done
+done
+(cd "$ROOT" && grep ' difx/' SHA1SUMS | sha1sum -c -)
 
 # Files copied whole (no transformation, no command needed) — see README.md for every URL:
 #   misc/emerlin_multiuv.IDI1,

@@ -18,7 +18,7 @@ The two cutting tools and the checker live in `scripts/`:
 | `trim_idifits.py` | FITS-IDI: keeps a subset of `UV_DATA` rows, rewrites `NAXIS2`, copies every other HDU as raw bytes |
 | `trim_uvfits_groups.py` | UVFITS random groups: keeps a subset of groups, rewrites `GCOUNT`, copies every table extension as raw bytes (they move up in the file because the tables *follow* the data) |
 | `verify_excerpt.py` | re-proves the guarantee: hashes everything outside the trimmed segment of the full file and of the excerpt and diffs the trimmed HDU's header card by card |
-| `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` from its tarball and checks it against `SHA1SUMS` |
+| `MAKE.sh` | regenerates every excerpt from its source URL, then runs `verify_excerpt.py` on it; also extracts `misc/K08161.0.FITS` and the six `difx/` files from their tarballs and checks them against `SHA1SUMS` |
 
 `verify_excerpt.py` was run on all eleven excerpts below; all eleven report
 **`VERDICT: verbatim subset`** with exactly one differing card.
@@ -608,6 +608,55 @@ one, the empty case, and save/load round-trips through `tempname()`.
 
 ---
 
+## `difx/` — DiFX job text files, EHT 2021 345 GHz (ALMA archive)
+
+| file | bytes | staged SHA1 | transformation |
+|---|---|---|---|
+| `e21f19-1-b4_1014.input` | 65 235 | `209cba7ea94c28189924690060cbc7e7087b5167` | none (tarball member) |
+| `e21f19-1-b4_1014.calc` | 2 451 | `338294d427d23e7c17a1b32b550d35a7a6e21eac` | none (tarball member) |
+| `e21f19-1-b4_1014.im` | 21 883 | `cd0037d84a64191924b6f8064fae5361a32f31f3` | none (tarball member) |
+| `e21f19-1-b2_1014.input` | 230 143 | `02c945f88409d0bbdf738ec3c82814bbfc9bc1a0` | none (tarball member) |
+| `e21f19-1-b2_1014.calc` | 2 659 | `859ec3b5f7d991ee40a9e014ddfa981f9441eda6` | none (tarball member) |
+| `e21f19-1-b2_1014.im` | 32 058 | `8b942e908e116de2ea555a820e5bd2d71ae0994f` | none (tarball member) |
+
+The DiFX correlator job files (`.input`, `.calc`, `.im`) of one job of the Event
+Horizon Telescope 2021 April 345 GHz campaign, experiment `e21f19`, ALMA project
+`2011.0.00013.E`, as delivered by the ALMA archive. Each group is a member of a plain `tar`
+under <https://almascience.eso.org/almadata/ec/eht-2021/2011.0.00013.E/>:
+
+| files | tarball | bytes | MD5 (= the archive's `md5sum.txt`) | SHA1 |
+|---|---|---|---|---|
+| `e21f19-1-b4_1014.*` | `group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b4-b7mar20-J1512-0905-dxin.tar` | 481 280 | `8caa2984f0fdd9ab7496014de21e7a94` | `abbd7e6907d0331e725172ef5fa7ab116a8706f3` |
+| `e21f19-1-b2_1014.*` | `group.uid___A001_X14d7_X1da.ec_gcrew.e21f19-2-b2-b7mar20-J1512-0905-dxin.tar` | 1 802 240 | `1c0f5c040aa5c9fbe019b9a980baf04c` | `2af0390a5defac64b468237267f1f1a91f1a39ce` |
+
+The members are extracted with `tar -xOf` and are byte-identical to the tarball contents
+(`MAKE.sh` repeats the extraction and checks `SHA1SUMS`). Both groups are job 1014, scan
+`109-0328` on J1512-0905, 2021-04-19 03:28:00–03:32:00 UTC (`START MJD 59323`,
+`START SECONDS 12480`, 240 s), 0.4 s integrations, in two of the four 345 GHz bands:
+
+**`e21f19-1-b4_1014.*`** — band 4, correlated with **DiFX 2.6.2** (`.calc`
+`DIFX VERSION: DiFX-262`). 2 telescopes (AA = ALMA, PV), 4 datastreams (two per telescope,
+VDIF), 12 baselines, 67 `FREQ TABLE` entries (one lower sideband, entry 34: 2048 MHz,
+131 072 channels), zoom bands throughout. The 2.6 layout: no `GAIN OFFSET`, no `TARGET FREQ`.
+The archive tarball lists the `.input` and `.calc` with a 2024-09-24 timestamp and the `.im`
+with 2023-03-16, the correlation date; the files are kept as delivered.
+
+**`e21f19-1-b2_1014.*`** — band 2, correlated with **DiFX 2.7.1** (`DiFX-2.7.1`). 3 telescopes
+(AA, NN, PV), 8 datastreams (NN as four `INTERLACEDVDIF/…` threads), 36 baselines, 163
+`FREQ TABLE` entries (34 lower sideband) — the 2.7 "output band" layout, with a `GAIN OFFSET`
+line for every recorded frequency (130) and a `TARGET FREQ` line for every baseline frequency
+(1 428).
+
+In both, the `.im` header says `ABERRATION CORR: MIXED` and the delay-model rows of AA have a
+different number layout from the other antennas: the `.im` was produced by DiFX's
+`calcifMixed.py`, which merges a normal and a no-atmosphere `difxcalc` run and rewrites the
+DELAY/DRY/WET rows of ALMA.
+*Serves:* the `DiFX .input …` / `DiFX .calc and .im …` testitems — the strict sequential
+readers of all three text formats against real files of both DiFX versions the 2021 EHT
+correlation used.
+
+---
+
 ## Totals
 
 | directory | files | bytes |
@@ -619,8 +668,9 @@ one, the empty case, and save/load round-trips through `tempname()`.
 | `vsop/` | 1 | 1 699 200 |
 | `misc/` | 9 | 199 791 360 |
 | `pkg-data/` | 23 | 34 704 730 |
-| `scripts/` | 4 | 46 196 |
-| **total (data + scripts)** | **48 + 4** | **567 496 206 B ≈ 567.5 MB** |
+| `difx/` | 6 | 354 429 |
+| `scripts/` | 4 | 46 982 |
+| **total (data + scripts)** | **54 + 4** | **567 851 421 B ≈ 567.9 MB** |
 
 Largest single file: `vlba-difx/VLBA_BL178AC_…excerpt.idifits`, 60.0 MB (see the size note
 above). Every other file is ≤ 78 MB; nothing is anywhere near GitHub's 100 MB hard limit.
